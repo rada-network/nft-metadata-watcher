@@ -18,6 +18,7 @@ async function bootstrap() {
   const service = await app.resolve(ChainlogsWatcherService);
   const config = await app.resolve(ConfigService);
   await service.getAllLogs(
+    // TODO: consider computing scanStartBlock
     parseInt(config.get('blockchain.scanStartBlock'), 10),
   );
 }
