@@ -8,6 +8,11 @@ export interface IWeb3Service {
 
   getGasPrice(): Promise<BigNumber>;
 
+  /**
+   * Returns the current block number with retry attemps.
+   * @param isRetry
+   * @returns
+   */
   getBlockNumber(isRetry?: boolean): Promise<number>;
 
   sign(txData: TxData, privateKey: Buffer): string;
