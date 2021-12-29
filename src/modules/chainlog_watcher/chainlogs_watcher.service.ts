@@ -27,13 +27,15 @@ export class ChainlogsWatcherService {
     // TODO: add ethereum maintaince to be able to pause this process.
     const confirmedBlockNumber =
       (await this.web3Service.getBlockNumber(true)) -
-      parseInt(this.configService.get('blockchain.confirmationBlocks'), 10);
+      parseInt(this.configService.get('blockchain.delayConfirmedBlocks'), 10);
 
     if (confirmedBlockNumber < fromBlock) {
+      this.logger.log('Sleep...zzz');
+
       await new Promise((res): void => {
         setTimeout(() => {
           res(() => `sleeped`);
-        }, 60 * 1000);
+        }, this.configService.get('blockchain.sleepTime'));
       });
       return this.getLogs(fromBlock);
     }
