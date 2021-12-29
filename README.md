@@ -5,6 +5,8 @@
 ## Local:
 
 ```sh
+yarn install
+# Run watcher
 yarn start:watcher:dev
 ```
 
