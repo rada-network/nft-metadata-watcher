@@ -15,12 +15,11 @@ export class ChainlogsWatcherService {
 
   private readonly logger = new Logger(ChainlogsWatcherService.name);
 
-  async getAllLogs(fromBlock: number): Promise<boolean> {
+  async getAllLogs(fromBlock: number) {
     await this.getLogs(fromBlock).catch((e) => {
       this.logger.error(`CRASH watcher: ${e}`);
-      return false;
+      throw e;
     });
-    return true;
   }
 
   private async getLogs(fromBlock: number): Promise<void> {
