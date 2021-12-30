@@ -1,6 +1,9 @@
 import { Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { getAddress, getOpenBoxEventTopics } from 'src/common/contracts/sample';
+import {
+  getAddress,
+  getOpenBoxEventTopics,
+} from 'src/common/contracts/NftAuctionContract';
 import { IWeb3Service } from 'src/common/web3/web3.service.interface';
 
 const MAXIMUM_SCANNING_BLOCKS = 40;
@@ -47,37 +50,39 @@ export class ChainlogsWatcherService {
 
     const networkId = this.configService.get('blockchain.networkId');
 
-    //watch OpenBox logs
-    const watchOpenBoxLogsResult = this.watchOpenBoxLogs(
+    //watch NftAuctionContract logs
+    const watchNftAuctionContractLogsResult = this.watchNftAuctionContractLogs(
       fromBlock,
       toBlock,
       networkId,
     );
 
-    await Promise.all([watchOpenBoxLogsResult]);
+    await Promise.all([watchNftAuctionContractLogsResult]);
 
     return this.getLogs(toBlock + 1);
   }
 
-  private async watchOpenBoxLogs(
+  private async watchNftAuctionContractLogs(
     fromBlock: number,
     toBlock: number,
     networkId: string,
   ) {
-    // contracts logs
+    // contract logs
     const logs = await this.web3Service.getPastLogs({
       fromBlock,
       toBlock,
       address: getAddress(networkId),
     });
-    this.logger.log(`scanned OpenBox logs: ${JSON.stringify(logs)}`);
+    this.logger.log(`scanned NftAuctionContract logs: ${JSON.stringify(logs)}`);
 
     // TODO: match openBox contract log.
     const openBoxTopics = getOpenBoxEventTopics(networkId);
     const openBoxLogs = logs.filter(({ topics }) =>
       openBoxTopics.includes(topics[0]),
     );
-    this.logger.log(`scanned OpenBox logs: ${JSON.stringify(openBoxLogs)}`);
+    this.logger.log(
+      `scanned OpenBox event logs: ${JSON.stringify(openBoxLogs)}`,
+    );
 
     // TODO: handling scanned OpenBox logs data.
     // TODO: add warning except log.

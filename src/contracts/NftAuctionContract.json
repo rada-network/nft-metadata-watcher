@@ -1,0 +1,40 @@
+{
+  "networks": {
+    "97": {
+      "events": {
+        "0xf27cb086552a8943ead840a998036e1aba3ab736d13445391078f7113a90eda0": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "buyerAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint16",
+              "name": "campaignId",
+              "type": "uint16"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint32",
+              "name": "quantity",
+              "type": "uint32"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "priceEach",
+              "type": "uint256"
+            }
+          ],
+          "name": "PlaceBid",
+          "type": "event"
+        }
+      },
+      "address": "0x1ae61e192a7d290768a28255fa4453d954dce262"
+    }
+  }
+}
