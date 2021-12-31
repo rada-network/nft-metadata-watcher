@@ -1,7 +1,7 @@
 # nft-metadata-watcher
 
-![Rada Auction flow image](https://crustwebsites.net/ipfs/QmZfJAuCaF16JSGPQUtHJJCKonK58kWu6R2BV82T2NexYD?filename=5f2dfcac-e816-4f6d-96b6-579c07fb21ac.jpeg)
-![OpenBox Flow image](https://crustwebsites.net/ipfs/QmbQKQyJui2jAVspWTgt67kKnuYRJRwVnzYLiFT2ACZzSo?filename=38c0c5af-cbef-4227-8ada-6244e28ca8c3.jpeg)
+![Rada Auction flow image](https://crustwebsites.net/ipfs/QmYWz9rMnYciiTHK719n8FFgMLVPEsmjPYa6DUu9RY9sHT?filename=rada-acution-flow.jpg)
+![OpenBox Flow image](https://crustwebsites.net/ipfs/QmSM9ZHvHrnNNJLxJ13QDNh44GNehNB6FsEqKDpj5muY3x?filename=openbox-flow.jpg)
 
 // TODO: add Dockerfile, kubernetes-deployment files.
 
