@@ -1,5 +1,8 @@
 # nft-metadata-watcher
 
+![Rada Auction flow image](https://crustwebsites.net/ipfs/QmZfJAuCaF16JSGPQUtHJJCKonK58kWu6R2BV82T2NexYD?filename=5f2dfcac-e816-4f6d-96b6-579c07fb21ac.jpeg)
+![OpenBox Flow image](https://crustwebsites.net/ipfs/QmbQKQyJui2jAVspWTgt67kKnuYRJRwVnzYLiFT2ACZzSo?filename=38c0c5af-cbef-4227-8ada-6244e28ca8c3.jpeg)
+
 // TODO: add Dockerfile, kubernetes-deployment files.
 
 ## Local:
