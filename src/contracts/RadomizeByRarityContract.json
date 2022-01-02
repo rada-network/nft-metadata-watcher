@@ -1,0 +1,34 @@
+{
+  "networks": {
+    "80001": {
+      "events": {
+        "0x0e3481671e003b6034626dacb1d41d4f2ba7c0b610c55de9685c51b685153ae5": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "poolId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "itemId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "result",
+              "type": "uint256"
+            }
+          ],
+          "name": "DiceLanded",
+          "type": "event"
+        }
+      },
+      "address": "0xB95397048726DC3989FBF976720263dbfFa42793"
+    }
+  }
+}

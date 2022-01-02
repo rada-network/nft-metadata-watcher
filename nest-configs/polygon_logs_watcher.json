@@ -1,5 +1,5 @@
 {
   "collection": "@nestjs/schematics",
   "sourceRoot": "../src",
-  "entryFile": "./mains/watcher.main"
+  "entryFile": "./mains/polygon_logs_watcher.main"
 }

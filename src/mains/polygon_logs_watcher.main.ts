@@ -1,7 +1,7 @@
 import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { ChainlogsWatcherService } from 'src/modules/chainlog_watcher/chainlogs_watcher.service';
-import { AppModule } from '../app.modules/watcher.module';
+import { PolygonLogsWatcherService } from 'src/modules/polygon_logs_watcher/polygon_logs_watcher.service';
+import { AppModule } from '../app.modules/polygon_logs_watcher.module';
 import { DebugMonoLogger, MonoLogger } from './Logger';
 
 const loggerInstance =
@@ -15,7 +15,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     ...loggerInstance,
   });
-  const service = await app.resolve(ChainlogsWatcherService);
+  const service = await app.resolve(PolygonLogsWatcherService);
   const config = await app.resolve(ConfigService);
   await service.getAllLogs(
     // TODO: consider computing scanStartBlock

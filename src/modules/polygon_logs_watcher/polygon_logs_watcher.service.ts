@@ -2,13 +2,13 @@ import { Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   getAddress,
-  getOpenBoxEventTopics,
-} from 'src/common/contracts/NftAuctionContract';
+  getDiceLandedEventTopics,
+} from 'src/common/contracts/RadomizeByRarityContract';
 import { IWeb3Service } from 'src/common/web3/web3.service.interface';
 
 const MAXIMUM_SCANNING_BLOCKS = 40;
 
-export class ChainlogsWatcherService {
+export class PolygonLogsWatcherService {
   constructor(
     private readonly configService: ConfigService,
 
@@ -16,7 +16,7 @@ export class ChainlogsWatcherService {
     private readonly web3Service: IWeb3Service,
   ) {}
 
-  private readonly logger = new Logger(ChainlogsWatcherService.name);
+  private readonly logger = new Logger(PolygonLogsWatcherService.name);
 
   async getAllLogs(fromBlock: number) {
     await this.getLogs(fromBlock).catch((e) => {
@@ -51,18 +51,15 @@ export class ChainlogsWatcherService {
     const networkId = this.configService.get('blockchain.networkId');
 
     //watch NftAuctionContract logs
-    const watchNftAuctionContractLogsResult = this.watchNftAuctionContractLogs(
-      fromBlock,
-      toBlock,
-      networkId,
-    );
+    const watchRadomizeByRarityContractLogsResult =
+      this.watchRadomizeByRarityContractLogs(fromBlock, toBlock, networkId);
 
-    await Promise.all([watchNftAuctionContractLogsResult]);
+    await Promise.all([watchRadomizeByRarityContractLogsResult]);
 
     return this.getLogs(toBlock + 1);
   }
 
-  private async watchNftAuctionContractLogs(
+  private async watchRadomizeByRarityContractLogs(
     fromBlock: number,
     toBlock: number,
     networkId: string,
@@ -73,15 +70,17 @@ export class ChainlogsWatcherService {
       toBlock,
       address: getAddress(networkId),
     });
-    this.logger.log(`scanned NftAuctionContract logs: ${JSON.stringify(logs)}`);
+    this.logger.log(
+      `scanned watchRadomizeByRarityContract logs: ${JSON.stringify(logs)}`,
+    );
 
-    // TODO: match openBox contract log.
-    const openBoxTopics = getOpenBoxEventTopics(networkId);
-    const openBoxLogs = logs.filter(({ topics }) =>
-      openBoxTopics.includes(topics[0]),
+    // TODO: match DiceLanded  log.
+    const diceLandedTopics = getDiceLandedEventTopics(networkId);
+    const diceLandedLogs = logs.filter(({ topics }) =>
+      diceLandedTopics.includes(topics[0]),
     );
     this.logger.log(
-      `scanned OpenBox event logs: ${JSON.stringify(openBoxLogs)}`,
+      `scanned OpenBox event logs: ${JSON.stringify(diceLandedLogs)}`,
     );
 
     // TODO: handling scanned OpenBox logs data.

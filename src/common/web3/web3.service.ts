@@ -2,7 +2,6 @@ import Common from '@ethereumjs/common';
 import { Transaction, TxData } from '@ethereumjs/tx';
 import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import BigNumber from 'bignumber.js';
 import Web3 from 'web3';
 import { Log, PastLogsOptions } from 'web3-core';
@@ -10,27 +9,10 @@ import { BlockTransactionString } from 'web3-eth';
 import { IWeb3Service } from './web3.service.interface';
 
 @Injectable()
-export class Web3Service implements IWeb3Service {
+export abstract class Web3Service implements IWeb3Service {
   web3: Web3;
   common: Common;
-  private readonly logger = new Logger(Web3Service.name);
-
-  constructor(private readonly configService: ConfigService) {
-    // TODO: consider aws web3 provider for signature v4
-    this.web3 = new Web3(configService.get('blockchain.url'));
-
-    const networkId = parseInt(configService.get('blockchain.networkId'), 10);
-    const chainId = parseInt(configService.get('blockchain.chainId'), 10);
-    if (chainId === 1) {
-      this.common = new Common({ chain: 1 });
-    } else {
-      this.common = Common.forCustomChain('mainnet', {
-        name: 'private',
-        networkId,
-        chainId,
-      });
-    }
-  }
+  protected readonly logger = new Logger(Web3Service.name);
 
   getTransactionCount(address: string): Promise<number> {
     return this.web3.eth.getTransactionCount(address, 'pending');
