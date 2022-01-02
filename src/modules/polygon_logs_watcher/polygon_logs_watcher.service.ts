@@ -29,7 +29,7 @@ export class PolygonLogsWatcherService {
     // TODO: add ethereum maintaince to be able to pause this process.
     const confirmedBlockNumber =
       (await this.web3Service.getBlockNumber(true)) -
-      parseInt(this.configService.get('blockchain.delayConfirmedBlocks'), 10);
+      parseInt(this.configService.get('polygon.delayConfirmedBlocks'), 10);
 
     if (confirmedBlockNumber < fromBlock) {
       this.logger.log('Sleep...zzz');
@@ -37,7 +37,7 @@ export class PolygonLogsWatcherService {
       await new Promise((res): void => {
         setTimeout(() => {
           res(() => `sleeped`);
-        }, this.configService.get('blockchain.sleepTime'));
+        }, this.configService.get('polygon.sleepTime'));
       });
       return this.getLogs(fromBlock);
     }
@@ -48,7 +48,7 @@ export class PolygonLogsWatcherService {
     );
     this.logger.log(`scan block from ${fromBlock} to ${toBlock}`);
 
-    const networkId = this.configService.get('blockchain.networkId');
+    const networkId = this.configService.get('polygon.networkId');
 
     //watch NftAuctionContract logs
     const watchRadomizeByRarityContractLogsResult =

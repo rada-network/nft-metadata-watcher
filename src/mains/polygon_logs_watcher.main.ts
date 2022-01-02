@@ -19,7 +19,7 @@ async function bootstrap() {
   const config = await app.resolve(ConfigService);
   await service.getAllLogs(
     // TODO: consider computing scanStartBlock
-    parseInt(config.get('blockchain.scanStartBlock'), 10),
+    parseInt(config.get('polygon.scanStartBlock'), 10),
   );
 }
 
