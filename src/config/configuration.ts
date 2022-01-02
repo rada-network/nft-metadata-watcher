@@ -1,4 +1,7 @@
 export default () => ({
+  nftMetadata: {
+    path: process.env.NFT_METADATA_PATH,
+  },
   polygon: {
     url: process.env.POLYGON_URL,
     networkId: process.env.POLYGON_NETWORK_ID,
