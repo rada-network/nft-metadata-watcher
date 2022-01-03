@@ -1,9 +1,10 @@
 import { readFileSync } from 'fs';
 import { Logger, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { toAddressString } from '../ethereum_util/ethereum.util';
-
-const PRIVATE_KEY_STORED_PATH = '/data';
+import {
+  toAddressString,
+  toBufferFromString,
+} from '../ethereum_util/ethereum.util';
 
 export enum EthereumAccountRole {
   signer = 'signer',
@@ -12,7 +13,7 @@ export enum EthereumAccountRole {
 type EthereumAccounts = {
   signer: {
     privateKey?: Buffer;
-    publicKey?: string;
+    address?: string;
   };
 };
 
@@ -31,24 +32,28 @@ export class EthereumAccountsService {
     }
     // TODO: encrypt/secure privateKey
     const privateKeyBuffer = readFileSync(
-      `${PRIVATE_KEY_STORED_PATH}/${role}/privateKey`,
+      `${this.configService.get('ethereum_accounts.path')}/${role}/privateKey`,
     );
 
-    this.accounts[role].privateKey = privateKeyBuffer;
+    // BAD CODE
+    this.accounts[role].privateKey = toBufferFromString(
+      `0x${privateKeyBuffer.toString('utf-8')}`,
+    );
+
     return this.accounts[role].privateKey;
   }
 
   getAddress(role: EthereumAccountRole): string {
-    const accountAddress = this.accounts[role]?.publicKey;
+    const accountAddress = this.accounts[role]?.address;
     if (accountAddress) {
       return accountAddress;
     }
 
     const addressBuffer = readFileSync(
-      `${PRIVATE_KEY_STORED_PATH}/${role}/publicKey`,
+      `${this.configService.get('ethereum_accounts.path')}/${role}/address`,
     );
 
-    this.accounts[role].publicKey = toAddressString(addressBuffer);
-    return this.accounts[role].publicKey;
+    this.accounts[role].address = toAddressString(addressBuffer);
+    return this.accounts[role].address;
   }
 }

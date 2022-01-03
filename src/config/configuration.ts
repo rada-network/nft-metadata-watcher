@@ -2,6 +2,9 @@ export default () => ({
   nftMetadata: {
     path: process.env.NFT_METADATA_PATH,
   },
+  ethereum_accounts: {
+    path: process.env.ETHEREUM_ACCOUNTS_PATH,
+  },
   polygon: {
     url: process.env.POLYGON_URL,
     networkId: process.env.POLYGON_NETWORK_ID,

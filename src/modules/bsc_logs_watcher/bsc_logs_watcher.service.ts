@@ -30,8 +30,11 @@ export class BscLogsWatcherService {
   constructor(
     private readonly configService: ConfigService,
 
-    @Inject('IWeb3Service')
-    private readonly web3Service: IWeb3Service,
+    @Inject('BscWeb3Service')
+    private readonly bscWeb3Service: IWeb3Service,
+
+    @Inject('PolygonWeb3Service')
+    private readonly polygonWeb3Service: IWeb3Service,
 
     @Inject('EthereumAccountsService')
     private readonly ethereumAccountsService: EthereumAccountsService,
@@ -49,7 +52,7 @@ export class BscLogsWatcherService {
   private async getLogs(fromBlock: number): Promise<void> {
     // TODO: add ethereum maintaince to be able to pause this process.
     const confirmedBlockNumber =
-      (await this.web3Service.getBlockNumber(true)) -
+      (await this.bscWeb3Service.getBlockNumber(true)) -
       parseInt(this.configService.get('bsc.delayConfirmedBlocks'), 10);
 
     if (confirmedBlockNumber < fromBlock) {
@@ -89,7 +92,7 @@ export class BscLogsWatcherService {
     networkId: string,
   ) {
     // contract logs
-    const logs = await this.web3Service.getPastLogs({
+    const logs = await this.bscWeb3Service.getPastLogs({
       fromBlock,
       toBlock,
       address: getOpenBoxContractAddress(networkId),
@@ -104,14 +107,18 @@ export class BscLogsWatcherService {
       `scanned OpenBox event logs: ${JSON.stringify(openBoxLogs)}`,
     );
 
-    // TODO: optimize get nonce get getPrice
-    const nonce = await this.web3Service.getTransactionCount(
-      this.ethereumAccountsService.getAddress(EthereumAccountRole.signer),
-    );
-    this.logger.log(`nonce: ${nonce}`);
+    let nonce;
+    let gasPrice;
+    if (openBoxLogs.length > 0) {
+      // TODO: optimize get nonce get getPrice
+      nonce = await this.polygonWeb3Service.getTransactionCount(
+        this.ethereumAccountsService.getAddress(EthereumAccountRole.signer),
+      );
+      this.logger.log(`nonce: ${nonce}`);
 
-    const gasPrice = await this.web3Service.getGasPrice();
-    this.logger.log(`gasPrice: 0x${gasPrice.toString(16)}`);
+      gasPrice = await this.polygonWeb3Service.getGasPrice();
+      this.logger.log(`gasPrice: 0x${gasPrice.toString(16)}`);
+    }
 
     await Promise.map(
       openBoxLogs,
@@ -122,7 +129,6 @@ export class BscLogsWatcherService {
         const buyerAddress = toAddressString(dataBuffer.slice(0, 32));
 
         return {
-          networkId,
           transactionHash,
           buyerAddress,
           poolId,
@@ -138,7 +144,6 @@ export class BscLogsWatcherService {
   }
 
   private async handleOpenBoxLogData({
-    networkId,
     transactionHash,
     buyerAddress,
     poolId,
@@ -146,7 +151,6 @@ export class BscLogsWatcherService {
     nonce,
     gasPrice,
   }: {
-    networkId: string;
     transactionHash: string;
     buyerAddress: string;
     poolId: number;
@@ -165,25 +169,27 @@ export class BscLogsWatcherService {
         throw new Error(`${filePath} existed`);
       }
 
+      const polygonNetworkId = this.configService.get('polygon.networkId');
+      // TODO: check replay send tx
       const txData = this.createTxData({
-        to: getRadomizeByRarityContractAddress(networkId),
+        to: getRadomizeByRarityContractAddress(polygonNetworkId),
         gasLimit: REQUEST_RANDOM_NUMBER_GAS_LIMIT,
         gasPrice,
         value: new BigNumber(0),
-        data: requestRandomNumber(networkId, poolId, tokenId),
+        data: requestRandomNumber(polygonNetworkId, poolId, tokenId),
         nonce,
       });
       this.logger.log(`txData: ${JSON.stringify(txData)}`);
 
-      const signedTx = this.web3Service.sign(
+      const signedTx = this.polygonWeb3Service.sign(
         txData,
         this.ethereumAccountsService.getPrivateKey(EthereumAccountRole.signer),
       );
       this.logger.log(`signedTx: ${signedTx}`);
 
       // send tx
-      const hash = await this.web3Service.send(signedTx);
-      this.logger.log(`txHash: ${hash}`);
+      const hash = await this.polygonWeb3Service.send(signedTx);
+      this.logger.log(`Polygon txHash: ${hash}`);
 
       return true;
     } catch (e) {
