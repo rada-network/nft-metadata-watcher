@@ -87,23 +87,23 @@ export class PolygonLogsWatcherService {
       diceLandedTopics.includes(topics[0]),
     );
     this.logger.log(
-      `scanned OpenBox event logs: ${JSON.stringify(diceLandedLogs)}`,
+      `scanned diceLanded event logs: ${JSON.stringify(diceLandedLogs)}`,
     );
 
     await Promise.map(
       diceLandedLogs,
       ({ transactionHash, data }) => {
-        const dataBuffer = toBufferFromString(data.slice(2));
+        const dataBuffer = toBufferFromString(data);
         const poolId = new BigNumber(
-          toNumberString(dataBuffer.slice(0, 64)),
+          toNumberString(dataBuffer.slice(0, 32)),
           16,
         );
         const itemId = new BigNumber(
-          toNumberString(dataBuffer.slice(64, 128)),
+          toNumberString(dataBuffer.slice(32, 64)),
           16,
         );
         const result = new BigNumber(
-          toNumberString(dataBuffer.slice(128, 192)),
+          toNumberString(dataBuffer.slice(64, 96)),
           16,
         );
         return {
@@ -131,8 +131,9 @@ export class PolygonLogsWatcherService {
     result: BigNumber;
   }): Promise<boolean> {
     const basePath = this.configService.get('nftMetadata.path');
-    const poolDirectoryPath = `${basePath}/${poolId}`;
+    const poolDirectoryPath = `${basePath}/${poolId.toString()}`;
     const filePath = `${poolDirectoryPath}/${itemId.toString()}.json`;
+
     try {
       // TODO: optimize
       const isFileExisted = existsSync(filePath);
@@ -145,9 +146,9 @@ export class PolygonLogsWatcherService {
         await mkdir(poolDirectoryPath);
       }
       const json = JSON.stringify({
-        poolId,
-        itemId,
-        rarity: result,
+        poolId: poolId.toString(),
+        itemId: itemId.toString(),
+        rarity: result.toString(),
       });
 
       await writeFile(filePath, json, 'utf-8');
