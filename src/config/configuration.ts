@@ -10,4 +10,12 @@ export default () => ({
     delayConfirmedBlocks: process.env.POLYGON_DELAY_CONFIRMED_BLOCKS,
     sleepTime: process.env.POLYGON_SLEEP_TIME,
   },
+  bsc: {
+    url: process.env.BSC_URL,
+    networkId: process.env.BSC_CHAIN_ID,
+    chainId: process.env.BSC_NETWORK_ID,
+    scanStartBlock: process.env.BSC_SCAN_START_BLOCK,
+    delayConfirmedBlocks: process.env.BSC_DELAY_CONFIRMED_BLOCKS,
+    sleepTime: process.env.BSC_SLEEP_TIME,
+  },
 });

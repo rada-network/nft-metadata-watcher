@@ -1,16 +1,15 @@
 import { Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
-  getAddress,
+  getRadomizeByRarityContractAddress,
   getDiceLandedEventTopics,
 } from 'src/common/contracts/RadomizeByRarityContract';
 import { IWeb3Service } from 'src/common/web3/web3.service.interface';
 import { Promise } from 'bluebird';
 import {
   toBufferFromString,
-  toNumberString,
+  toNumber,
 } from 'src/common/ethereum_util/ethereum.util';
-import BigNumber from 'bignumber.js';
 import { existsSync } from 'fs';
 import { mkdir, writeFile } from 'fs/promises';
 
@@ -28,7 +27,7 @@ export class PolygonLogsWatcherService {
 
   async getAllLogs(fromBlock: number) {
     await this.getLogs(fromBlock).catch((e) => {
-      this.logger.error(`CRASH watcher: ${e}`);
+      this.logger.error(`CRASH polygon watcher: ${e}`);
       throw e;
     });
   }
@@ -76,7 +75,7 @@ export class PolygonLogsWatcherService {
     const logs = await this.web3Service.getPastLogs({
       fromBlock,
       toBlock,
-      address: getAddress(networkId),
+      address: getRadomizeByRarityContractAddress(networkId),
     });
     this.logger.log(
       `scanned watchRadomizeByRarityContract logs: ${JSON.stringify(logs)}`,
@@ -94,18 +93,12 @@ export class PolygonLogsWatcherService {
       diceLandedLogs,
       ({ transactionHash, data }) => {
         const dataBuffer = toBufferFromString(data);
-        const poolId = new BigNumber(
-          toNumberString(dataBuffer.slice(0, 32)),
-          16,
-        );
-        const itemId = new BigNumber(
-          toNumberString(dataBuffer.slice(32, 64)),
-          16,
-        );
-        const result = new BigNumber(
-          toNumberString(dataBuffer.slice(64, 96)),
-          16,
-        );
+        const poolId = toNumber(dataBuffer.slice(0, 32));
+
+        const itemId = toNumber(dataBuffer.slice(32, 64));
+
+        const result = toNumber(dataBuffer.slice(64, 96));
+
         return {
           transactionHash,
           poolId,
@@ -126,13 +119,13 @@ export class PolygonLogsWatcherService {
     result,
   }: {
     transactionHash: string;
-    poolId: BigNumber;
-    itemId: BigNumber;
-    result: BigNumber;
+    poolId: number;
+    itemId: number;
+    result: number;
   }): Promise<boolean> {
     const basePath = this.configService.get('nftMetadata.path');
-    const poolDirectoryPath = `${basePath}/${poolId.toString()}`;
-    const filePath = `${poolDirectoryPath}/${itemId.toString()}.json`;
+    const poolDirectoryPath = `${basePath}/${poolId}`;
+    const filePath = `${poolDirectoryPath}/${itemId}.json`;
 
     try {
       // TODO: optimize
@@ -146,9 +139,9 @@ export class PolygonLogsWatcherService {
         await mkdir(poolDirectoryPath);
       }
       const json = JSON.stringify({
-        poolId: poolId.toString(),
-        itemId: itemId.toString(),
-        rarity: result.toString(),
+        poolId,
+        itemId,
+        rarity: result,
       });
 
       await writeFile(filePath, json, 'utf-8');

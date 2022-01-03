@@ -1,0 +1,34 @@
+{
+  "networks": {
+    "97": {
+      "events": {
+        "0x1642633618f2731e024d08a0865cb6584ac926969a05f26e442f0d301d1e107c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "buyerAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint16",
+              "name": "poolId",
+              "type": "uint16"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "tokenId",
+              "type": "uint256"
+            }
+          ],
+          "name": "OpenBox",
+          "type": "event"
+        }
+      },
+      "address": "0xbA92132B464af8BC073fA1a7a518b32298435d68"
+    }
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "collection": "@nestjs/schematics",
+  "sourceRoot": "../src",
+  "entryFile": "./mains/bsc_logs_watcher.main"
+}

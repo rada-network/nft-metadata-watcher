@@ -4,6 +4,8 @@
 ![OpenBox Flow image](https://crustwebsites.net/ipfs/QmSM9ZHvHrnNNJLxJ13QDNh44GNehNB6FsEqKDpj5muY3x?filename=openbox-flow.jpg)
 
 // TODO: add Dockerfile, kubernetes-deployment files.
+// TODO: secure privateKey in /data directory
+// TODO: fire error log to chat app for monitoring.
 
 ## Local:
 
