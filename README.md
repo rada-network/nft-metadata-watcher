@@ -8,6 +8,7 @@
 // TODO: fire error log to chat app for monitoring.
 // TODO: optimize get nonce to speedup send transactions.
 // TODO: check nonce conflict.
+// TODO: discuss updateNFT func weakness.
 
 ## Local:
 

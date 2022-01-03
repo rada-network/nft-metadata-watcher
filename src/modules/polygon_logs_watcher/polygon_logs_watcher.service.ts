@@ -192,6 +192,19 @@ export class PolygonLogsWatcherService {
         nonce,
       });
       this.logger.log(`txData: ${JSON.stringify(txData)}`);
+
+      const signedTx = this.bscWeb3Service.sign(
+        txData,
+        this.ethereumAccountsService.getPrivateKey(EthereumAccountRole.signer),
+      );
+      this.logger.log(`signedTx: ${signedTx}`);
+
+      // send tx
+      const hash = await this.bscWeb3Service.send(signedTx);
+      this.logger.log(
+        `updateNFT(poolId=${poolId}, tokenId=${itemId}) txHash: ${hash}`,
+      );
+
       return true;
     } catch (e) {
       this.logger.error(`handleDiceLandedLogData error: ${e}`);

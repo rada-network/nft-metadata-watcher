@@ -185,19 +185,12 @@ export class BscLogsWatcherService {
       );
       this.logger.log(`signedTx: ${signedTx}`);
 
-      // send tx (not use await for async)
-      this.polygonWeb3Service
-        .send(signedTx)
-        .then((hash) => {
-          this.logger.log(
-            `requestRandomNumber(poolId=${poolId}, tokenId=${tokenId}) txHash: ${hash}`,
-          );
-        })
-        .catch((err) => {
-          this.logger.error(
-            `requestRandomNumber(poolId=${poolId}, tokenId=${tokenId}) error: ${err}`,
-          );
-        });
+      // send tx
+      const hash = await this.polygonWeb3Service.send(signedTx);
+
+      this.logger.log(
+        `requestRandomNumber(poolId=${poolId}, tokenId=${tokenId}) txHash: ${hash}`,
+      );
 
       return true;
     } catch (e) {
