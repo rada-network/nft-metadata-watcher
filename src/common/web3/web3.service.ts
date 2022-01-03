@@ -59,10 +59,12 @@ export abstract class Web3Service implements IWeb3Service {
 
   send(signedTx: string): Promise<string> {
     return new Promise((res, rej) =>
-      this.web3.eth.sendSignedTransaction(signedTx, (err, hash) => {
-        if (err) return rej(err);
-        return res(hash);
-      }),
+      this.web3.eth
+        .sendSignedTransaction(signedTx, (err, hash) => {
+          if (err) return rej(err);
+          return res(hash);
+        })
+        .on('error', (err) => this.logger.error(`Send error:  ${err}`)),
     );
   }
 

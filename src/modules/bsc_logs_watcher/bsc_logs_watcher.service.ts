@@ -32,10 +32,8 @@ export class BscLogsWatcherService {
 
     @Inject('BscWeb3Service')
     private readonly bscWeb3Service: IWeb3Service,
-
     @Inject('PolygonWeb3Service')
     private readonly polygonWeb3Service: IWeb3Service,
-
     @Inject('EthereumAccountsService')
     private readonly ethereumAccountsService: EthereumAccountsService,
   ) {}
@@ -111,6 +109,7 @@ export class BscLogsWatcherService {
     let gasPrice;
     if (openBoxLogs.length > 0) {
       // TODO: optimize get nonce get getPrice
+      // TODO: consider use separate transaction creator for optimizing send tx.
       nonce = await this.polygonWeb3Service.getTransactionCount(
         this.ethereumAccountsService.getAddress(EthereumAccountRole.signer),
       );
@@ -122,7 +121,7 @@ export class BscLogsWatcherService {
 
     await Promise.map(
       openBoxLogs,
-      ({ transactionHash, topics, data }) => {
+      ({ transactionHash, topics, data }, index) => {
         const poolId = toNumber(toBufferFromString(topics[1]));
         const tokenId = toNumber(toBufferFromString(topics[2]));
         const dataBuffer = toBufferFromString(data);
@@ -133,7 +132,7 @@ export class BscLogsWatcherService {
           buyerAddress,
           poolId,
           tokenId,
-          nonce,
+          nonce: nonce + index,
           gasPrice,
         };
       },
@@ -170,7 +169,6 @@ export class BscLogsWatcherService {
       }
 
       const polygonNetworkId = this.configService.get('polygon.networkId');
-      // TODO: check replay send tx
       const txData = this.createTxData({
         to: getRadomizeByRarityContractAddress(polygonNetworkId),
         gasLimit: REQUEST_RANDOM_NUMBER_GAS_LIMIT,
@@ -187,9 +185,19 @@ export class BscLogsWatcherService {
       );
       this.logger.log(`signedTx: ${signedTx}`);
 
-      // send tx
-      const hash = await this.polygonWeb3Service.send(signedTx);
-      this.logger.log(`Polygon txHash: ${hash}`);
+      // send tx (not use await for async)
+      this.polygonWeb3Service
+        .send(signedTx)
+        .then((hash) => {
+          this.logger.log(
+            `requestRandomNumber(poolId=${poolId}, tokenId=${tokenId}) txHash: ${hash}`,
+          );
+        })
+        .catch((err) => {
+          this.logger.error(
+            `requestRandomNumber(poolId=${poolId}, tokenId=${tokenId}) error: ${err}`,
+          );
+        });
 
       return true;
     } catch (e) {

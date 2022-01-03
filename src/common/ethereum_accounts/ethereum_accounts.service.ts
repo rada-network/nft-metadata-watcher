@@ -1,10 +1,7 @@
 import { readFileSync } from 'fs';
 import { Logger, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import {
-  toAddressString,
-  toBufferFromString,
-} from '../ethereum_util/ethereum.util';
+import { toBufferFromString } from '../ethereum_util/ethereum.util';
 
 export enum EthereumAccountRole {
   signer = 'signer',
@@ -35,7 +32,6 @@ export class EthereumAccountsService {
       `${this.configService.get('ethereum_accounts.path')}/${role}/privateKey`,
     );
 
-    // BAD CODE
     this.accounts[role].privateKey = toBufferFromString(
       `0x${privateKeyBuffer.toString('utf-8')}`,
     );
@@ -53,7 +49,7 @@ export class EthereumAccountsService {
       `${this.configService.get('ethereum_accounts.path')}/${role}/address`,
     );
 
-    this.accounts[role].address = toAddressString(addressBuffer);
+    this.accounts[role].address = addressBuffer.toString('utf-8');
     return this.accounts[role].address;
   }
 }

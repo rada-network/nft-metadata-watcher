@@ -6,6 +6,8 @@
 // TODO: add Dockerfile, kubernetes-deployment files.
 // TODO: secure privateKey in /data directory
 // TODO: fire error log to chat app for monitoring.
+// TODO: optimize get nonce to speedup send transactions.
+// TODO: check nonce conflict.
 
 ## Local:
 
