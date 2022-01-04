@@ -186,13 +186,6 @@ export class PolygonLogsWatcherService {
         throw new Error(`${poolDirectoryPath} directory not existed`);
       }
 
-      const json = JSON.stringify({
-        poolId: openBoxPoolId,
-        itemId,
-        rarity: result,
-      });
-      await writeFile(filePath, json, 'utf-8');
-
       // TODO: handle send back request to OpenBox contract.
       const bscNetworkId = this.configService.get('bsc.networkId');
       const txData = createTxData({
@@ -218,6 +211,13 @@ export class PolygonLogsWatcherService {
       this.logger.log(
         `updateNFT(poolId=${openBoxPoolId}, tokenId=${itemId}) txHash: ${hash}`,
       );
+
+      const json = JSON.stringify({
+        poolId: openBoxPoolId,
+        itemId,
+        rarity: result,
+      });
+      await writeFile(filePath, json, 'utf-8');
 
       return true;
     } catch (e) {
