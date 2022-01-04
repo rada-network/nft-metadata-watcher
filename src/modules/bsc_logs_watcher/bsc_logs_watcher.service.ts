@@ -43,6 +43,9 @@ export class BscLogsWatcherService {
 
   async getAllLogs() {
     try {
+      // BAD CODE
+      await this.ethereumAccountsService.initNonce(this.polygonWeb3Service);
+
       let startBlock;
       const startBlockStr = this.configService.get('bsc.scanStartBlock');
       if (startBlockStr) {
@@ -141,7 +144,7 @@ export class BscLogsWatcherService {
           gasPrice,
         };
       },
-      { concurrency: 1 },
+      { concurrency: 3 },
     ).map(this.handleOpenBoxLogData.bind(this));
 
     // TODO: add warning except log.
@@ -160,13 +163,13 @@ export class BscLogsWatcherService {
     tokenId: number;
     gasPrice: BigNumber;
   }): Promise<boolean> {
-    const randomizePoolId = openBoxToRandomizeByRarityPool(poolId);
-
-    const basePath = this.configService.get('nftMetadata.path');
-    const poolDirectoryPath = `${basePath}/${poolId}`;
-    const filePath = `${poolDirectoryPath}/${tokenId}.json`;
-
     try {
+      const randomizePoolId = openBoxToRandomizeByRarityPool(poolId);
+
+      const basePath = this.configService.get('nftMetadata.path');
+      const poolDirectoryPath = `${basePath}/${poolId}`;
+      const filePath = `${poolDirectoryPath}/${tokenId}.json`;
+
       // TODO: optimize
       const isFileExisted = existsSync(filePath);
       if (isFileExisted) {
@@ -180,9 +183,8 @@ export class BscLogsWatcherService {
         gasPrice,
         value: new BigNumber(0),
         data: requestRandomNumber(polygonNetworkId, randomizePoolId, tokenId),
-        nonce: await this.ethereumAccountsService.getNonce(
+        nonce: this.ethereumAccountsService.getNonce(
           EthereumAccountRole.signer,
-          this.polygonWeb3Service,
         ),
       });
       this.logger.log(`txData: ${JSON.stringify(txData)}`);

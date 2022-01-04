@@ -18,7 +18,7 @@ export const randomizeByRarityToOpenBoxPool = (
 ): number => {
   for (const openBoxPoolId in OpenBoxToRandomizeByRarity) {
     if (OpenBoxToRandomizeByRarity[openBoxPoolId] === randomizePoolId) {
-      return randomizePoolId;
+      return parseInt(openBoxPoolId, 10);
     }
   }
 

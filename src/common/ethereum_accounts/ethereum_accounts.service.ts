@@ -24,6 +24,13 @@ export class EthereumAccountsService {
 
   private accounts: EthereumAccounts = { signer: {} };
 
+  async initNonce(web3Service: IWeb3Service) {
+    this.accounts[EthereumAccountRole.signer].nonce =
+      await web3Service.getTransactionCount(
+        this.getAddress(EthereumAccountRole.signer),
+      );
+  }
+
   getPrivateKey(role: EthereumAccountRole): Buffer {
     const accountPrivateKey = this.accounts[role]?.privateKey;
     if (accountPrivateKey) {
@@ -55,17 +62,13 @@ export class EthereumAccountsService {
     return this.accounts[role].address;
   }
 
-  async getNonce(
-    role: EthereumAccountRole,
-    web3Service: IWeb3Service,
-  ): Promise<number> {
-    if (this.accounts[role].nonce) {
-      return this.accounts[role].nonce + 1;
+  getNonce(role: EthereumAccountRole): number {
+    const nonce = this.accounts[role].nonce;
+    if (!nonce) {
+      new Error('Need to init ethereum accounts');
     }
 
-    const nonce = await web3Service.getTransactionCount(this.getAddress(role));
-
-    this.accounts[role].nonce = nonce;
-    return this.accounts[role].nonce;
+    this.accounts[role].nonce = nonce + 1;
+    return nonce;
   }
 }

@@ -1,4 +1,3 @@
-import { TxData } from '@ethereumjs/tx';
 import { Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -44,6 +43,9 @@ export class PolygonLogsWatcherService {
 
   async getAllLogs() {
     try {
+      // BAD CODE
+      await this.ethereumAccountsService.initNonce(this.bscWeb3Service);
+
       let startBlock;
       const startBlockStr = this.configService.get('polygon.scanStartBlock');
       if (startBlockStr) {
@@ -146,7 +148,7 @@ export class PolygonLogsWatcherService {
           gasPrice,
         };
       },
-      { concurrency: 1 },
+      { concurrency: 3 },
     ).map(this.handleDiceLandedLogData.bind(this));
 
     // TODO: add warning except log.
@@ -165,29 +167,30 @@ export class PolygonLogsWatcherService {
     result: number;
     gasPrice: BigNumber;
   }): Promise<boolean> {
-    const openBoxPoolId = randomizeByRarityToOpenBoxPool(poolId);
-
-    const basePath = this.configService.get('nftMetadata.path');
-    const poolDirectoryPath = `${basePath}/${openBoxPoolId}`;
-    const filePath = `${poolDirectoryPath}/${itemId}.json`;
-
     try {
+      const openBoxPoolId = randomizeByRarityToOpenBoxPool(poolId);
+
+      const basePath = this.configService.get('nftMetadata.path');
+      const poolDirectoryPath = `${basePath}/${openBoxPoolId}`;
+      const filePath = `${poolDirectoryPath}/${itemId}.json`;
+
       // TODO: optimize
       const isFileExisted = existsSync(filePath);
       if (isFileExisted) {
-        throw new Error(`${filePath} existed`);
+        throw new Error(`${filePath} file existed`);
       }
 
+      // TODO: init folder.
       const isPoolDirectoryExisted = existsSync(poolDirectoryPath);
       if (!isPoolDirectoryExisted) {
-        await mkdir(poolDirectoryPath);
+        throw new Error(`${poolDirectoryPath} directory not existed`);
       }
+
       const json = JSON.stringify({
         poolId: openBoxPoolId,
         itemId,
         rarity: result,
       });
-
       await writeFile(filePath, json, 'utf-8');
 
       // TODO: handle send back request to OpenBox contract.
@@ -198,9 +201,8 @@ export class PolygonLogsWatcherService {
         gasPrice,
         value: new BigNumber(0),
         data: updateNFT(bscNetworkId, openBoxPoolId, itemId, result),
-        nonce: await this.ethereumAccountsService.getNonce(
+        nonce: this.ethereumAccountsService.getNonce(
           EthereumAccountRole.signer,
-          this.bscWeb3Service,
         ),
       });
       this.logger.log(`txData: ${JSON.stringify(txData)}`);
