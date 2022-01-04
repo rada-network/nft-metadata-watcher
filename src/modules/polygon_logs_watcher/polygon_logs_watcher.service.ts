@@ -2,12 +2,13 @@ import { TxData } from '@ethereumjs/tx';
 import { Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
-  getRadomizeByRarityContractAddress,
+  getRandomizeByRarityContractAddress,
   getDiceLandedEventTopics,
-} from 'src/common/contracts/RadomizeByRarityContract';
+} from 'src/common/contracts/RandomizeByRarityContract';
 import { IWeb3Service } from 'src/common/web3/web3.service.interface';
 import { Promise } from 'bluebird';
 import {
+  createTxData,
   toBufferFromString,
   toNumber,
 } from 'src/common/ethereum_util/ethereum.util';
@@ -23,6 +24,7 @@ import {
   EthereumAccountRole,
   EthereumAccountsService,
 } from 'src/common/ethereum_accounts/ethereum_accounts.service';
+import { randomizeByRarityToOpenBoxPool } from 'src/common/contracts/utils/pool_mapping';
 
 const MAXIMUM_SCANNING_BLOCKS = 40;
 
@@ -73,15 +75,15 @@ export class PolygonLogsWatcherService {
     const networkId = this.configService.get('polygon.networkId');
 
     //watch NftAuctionContract logs
-    const watchRadomizeByRarityContractLogsResult =
-      this.watchRadomizeByRarityContractLogs(fromBlock, toBlock, networkId);
+    const watchRandomizeByRarityContractLogsResult =
+      this.watchRandomizeByRarityContractLogs(fromBlock, toBlock, networkId);
 
-    await Promise.all([watchRadomizeByRarityContractLogsResult]);
+    await Promise.all([watchRandomizeByRarityContractLogsResult]);
 
     return this.getLogs(toBlock + 1);
   }
 
-  private async watchRadomizeByRarityContractLogs(
+  private async watchRandomizeByRarityContractLogs(
     fromBlock: number,
     toBlock: number,
     networkId: string,
@@ -90,10 +92,10 @@ export class PolygonLogsWatcherService {
     const logs = await this.polygonWeb3Service.getPastLogs({
       fromBlock,
       toBlock,
-      address: getRadomizeByRarityContractAddress(networkId),
+      address: getRandomizeByRarityContractAddress(networkId),
     });
     this.logger.log(
-      `scanned watchRadomizeByRarityContract logs: ${JSON.stringify(logs)}`,
+      `scanned watchRandomizeByRarityContract logs: ${JSON.stringify(logs)}`,
     );
 
     const diceLandedTopics = getDiceLandedEventTopics(networkId);
@@ -104,23 +106,16 @@ export class PolygonLogsWatcherService {
       `scanned diceLanded event logs: ${JSON.stringify(diceLandedLogs)}`,
     );
 
-    let nonce;
     let gasPrice;
     if (diceLandedLogs.length > 0) {
-      // TODO: optimize get nonce get getPrice
       // TODO: consider use separate transaction creator for optimizing send tx.
-      nonce = await this.bscWeb3Service.getTransactionCount(
-        this.ethereumAccountsService.getAddress(EthereumAccountRole.signer),
-      );
-      this.logger.log(`nonce: ${nonce}`);
-
       gasPrice = await this.bscWeb3Service.getGasPrice();
       this.logger.log(`gasPrice: 0x${gasPrice.toString(16)}`);
     }
 
     await Promise.map(
       diceLandedLogs,
-      ({ transactionHash, data }, index) => {
+      ({ transactionHash, data }) => {
         const dataBuffer = toBufferFromString(data);
         const poolId = toNumber(dataBuffer.slice(0, 32));
 
@@ -133,7 +128,6 @@ export class PolygonLogsWatcherService {
           poolId,
           itemId,
           result,
-          nonce: nonce + index,
           gasPrice,
         };
       },
@@ -148,18 +142,18 @@ export class PolygonLogsWatcherService {
     poolId,
     itemId,
     result,
-    nonce,
     gasPrice,
   }: {
     transactionHash: string;
     poolId: number;
     itemId: number;
     result: number;
-    nonce: number;
     gasPrice: BigNumber;
   }): Promise<boolean> {
+    const openBoxPoolId = randomizeByRarityToOpenBoxPool(poolId);
+
     const basePath = this.configService.get('nftMetadata.path');
-    const poolDirectoryPath = `${basePath}/${poolId}`;
+    const poolDirectoryPath = `${basePath}/${openBoxPoolId}`;
     const filePath = `${poolDirectoryPath}/${itemId}.json`;
 
     try {
@@ -174,7 +168,7 @@ export class PolygonLogsWatcherService {
         await mkdir(poolDirectoryPath);
       }
       const json = JSON.stringify({
-        poolId,
+        poolId: openBoxPoolId,
         itemId,
         rarity: result,
       });
@@ -183,13 +177,16 @@ export class PolygonLogsWatcherService {
 
       // TODO: handle send back request to OpenBox contract.
       const bscNetworkId = this.configService.get('bsc.networkId');
-      const txData = this.createTxData({
+      const txData = createTxData({
         to: getOpenBoxContractAddress(bscNetworkId),
         gasLimit: UPDATE_NFT_NUMBER_GAS_LIMIT,
         gasPrice,
         value: new BigNumber(0),
-        data: updateNFT(bscNetworkId, poolId, itemId, result),
-        nonce,
+        data: updateNFT(bscNetworkId, openBoxPoolId, itemId, result),
+        nonce: await this.ethereumAccountsService.getNonce(
+          EthereumAccountRole.signer,
+          this.bscWeb3Service,
+        ),
       });
       this.logger.log(`txData: ${JSON.stringify(txData)}`);
 
@@ -202,30 +199,12 @@ export class PolygonLogsWatcherService {
       // send tx
       const hash = await this.bscWeb3Service.send(signedTx);
       this.logger.log(
-        `updateNFT(poolId=${poolId}, tokenId=${itemId}) txHash: ${hash}`,
+        `updateNFT(poolId=${openBoxPoolId}, tokenId=${itemId}) txHash: ${hash}`,
       );
 
       return true;
     } catch (e) {
       this.logger.error(`handleDiceLandedLogData error: ${e}`);
     }
-  }
-
-  private createTxData(obj: {
-    to: string;
-    gasLimit: string;
-    gasPrice: BigNumber;
-    value: BigNumber;
-    data: string;
-    nonce: number;
-  }): TxData {
-    return {
-      to: obj.to,
-      gasLimit: `0x${new BigNumber(obj.gasLimit).toString(16)}`,
-      gasPrice: `0x${new BigNumber(obj.gasPrice).toString(16)}`,
-      value: `0x${new BigNumber(obj.value).toString(16)}`,
-      data: obj.data,
-      nonce: `0x${new BigNumber(obj.nonce).toString(16)}`,
-    };
   }
 }

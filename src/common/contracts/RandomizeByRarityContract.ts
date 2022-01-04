@@ -1,6 +1,6 @@
 import { AbiItem } from 'web3-utils';
 import Contract from 'web3-eth-contract';
-import { abi, networks } from '../../contracts/RadomizeByRarityContract.json';
+import { abi, networks } from '../../contracts/RandomizeByRarityContract.json';
 
 // TODO: optimize gas
 export const REQUEST_RANDOM_NUMBER_GAS_LIMIT = '210000';
@@ -10,8 +10,9 @@ export const getDiceLandedEventTopics = (networkId: string) => {
   return Object.keys(events).filter((key) => events[key].name === 'DiceLanded');
 };
 
-export const getRadomizeByRarityContractAddress = (networkId: string): string =>
-  networks[networkId].address.toLowerCase();
+export const getRandomizeByRarityContractAddress = (
+  networkId: string,
+): string => networks[networkId].address.toLowerCase();
 
 export const requestRandomNumber = (
   networkId: string,
@@ -22,7 +23,7 @@ export const requestRandomNumber = (
   // @ts-ignore
   const contract = new Contract(
     abi as AbiItem[],
-    getRadomizeByRarityContractAddress(networkId),
+    getRandomizeByRarityContractAddress(networkId),
   );
 
   return contract.methods.requestRandomNumber(poolId, tokenId).encodeABI();

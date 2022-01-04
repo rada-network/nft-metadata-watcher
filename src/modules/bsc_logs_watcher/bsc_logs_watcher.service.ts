@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { IWeb3Service } from 'src/common/web3/web3.service.interface';
 import { Promise } from 'bluebird';
 import {
+  createTxData,
   toAddressString,
   toBufferFromString,
   toNumber,
@@ -18,11 +19,12 @@ import {
   getOpenBoxEventTopics,
 } from 'src/common/contracts/OpenBoxContract';
 import {
-  getRadomizeByRarityContractAddress,
+  getRandomizeByRarityContractAddress,
   requestRandomNumber,
   REQUEST_RANDOM_NUMBER_GAS_LIMIT,
-} from 'src/common/contracts/RadomizeByRarityContract';
+} from 'src/common/contracts/RandomizeByRarityContract';
 import BigNumber from 'bignumber.js';
+import { openBoxToRandomizeByRarityPool } from 'src/common/contracts/utils/pool_mapping';
 
 const MAXIMUM_SCANNING_BLOCKS = 40;
 
@@ -105,23 +107,16 @@ export class BscLogsWatcherService {
       `scanned OpenBox event logs: ${JSON.stringify(openBoxLogs)}`,
     );
 
-    let nonce;
     let gasPrice;
     if (openBoxLogs.length > 0) {
-      // TODO: optimize get nonce get getPrice
       // TODO: consider use separate transaction creator for optimizing send tx.
-      nonce = await this.polygonWeb3Service.getTransactionCount(
-        this.ethereumAccountsService.getAddress(EthereumAccountRole.signer),
-      );
-      this.logger.log(`nonce: ${nonce}`);
-
       gasPrice = await this.polygonWeb3Service.getGasPrice();
       this.logger.log(`gasPrice: 0x${gasPrice.toString(16)}`);
     }
 
     await Promise.map(
       openBoxLogs,
-      ({ transactionHash, topics, data }, index) => {
+      ({ transactionHash, topics, data }) => {
         const poolId = toNumber(toBufferFromString(topics[1]));
         const tokenId = toNumber(toBufferFromString(topics[2]));
         const dataBuffer = toBufferFromString(data);
@@ -132,7 +127,6 @@ export class BscLogsWatcherService {
           buyerAddress,
           poolId,
           tokenId,
-          nonce: nonce + index,
           gasPrice,
         };
       },
@@ -147,16 +141,16 @@ export class BscLogsWatcherService {
     buyerAddress,
     poolId,
     tokenId,
-    nonce,
     gasPrice,
   }: {
     transactionHash: string;
     buyerAddress: string;
     poolId: number;
     tokenId: number;
-    nonce: number;
     gasPrice: BigNumber;
   }): Promise<boolean> {
+    const randomizePoolId = openBoxToRandomizeByRarityPool(poolId);
+
     const basePath = this.configService.get('nftMetadata.path');
     const poolDirectoryPath = `${basePath}/${poolId}`;
     const filePath = `${poolDirectoryPath}/${tokenId}.json`;
@@ -169,13 +163,16 @@ export class BscLogsWatcherService {
       }
 
       const polygonNetworkId = this.configService.get('polygon.networkId');
-      const txData = this.createTxData({
-        to: getRadomizeByRarityContractAddress(polygonNetworkId),
+      const txData = createTxData({
+        to: getRandomizeByRarityContractAddress(polygonNetworkId),
         gasLimit: REQUEST_RANDOM_NUMBER_GAS_LIMIT,
         gasPrice,
         value: new BigNumber(0),
-        data: requestRandomNumber(polygonNetworkId, poolId, tokenId),
-        nonce,
+        data: requestRandomNumber(polygonNetworkId, randomizePoolId, tokenId),
+        nonce: await this.ethereumAccountsService.getNonce(
+          EthereumAccountRole.signer,
+          this.polygonWeb3Service,
+        ),
       });
       this.logger.log(`txData: ${JSON.stringify(txData)}`);
 
@@ -187,7 +184,6 @@ export class BscLogsWatcherService {
 
       // send tx
       const hash = await this.polygonWeb3Service.send(signedTx);
-
       this.logger.log(
         `requestRandomNumber(poolId=${poolId}, tokenId=${tokenId}) txHash: ${hash}`,
       );
@@ -196,23 +192,5 @@ export class BscLogsWatcherService {
     } catch (e) {
       this.logger.error(`handleOpenBoxLogData error: ${e}`);
     }
-  }
-
-  private createTxData(obj: {
-    to: string;
-    gasLimit: string;
-    gasPrice: BigNumber;
-    value: BigNumber;
-    data: string;
-    nonce: number;
-  }): TxData {
-    return {
-      to: obj.to,
-      gasLimit: `0x${new BigNumber(obj.gasLimit).toString(16)}`,
-      gasPrice: `0x${new BigNumber(obj.gasPrice).toString(16)}`,
-      value: `0x${new BigNumber(obj.value).toString(16)}`,
-      data: obj.data,
-      nonce: `0x${new BigNumber(obj.nonce).toString(16)}`,
-    };
   }
 }

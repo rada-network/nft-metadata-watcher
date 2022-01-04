@@ -2,15 +2,17 @@ import { readFileSync } from 'fs';
 import { Logger, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { toBufferFromString } from '../ethereum_util/ethereum.util';
+import { IWeb3Service } from '../web3/web3.service.interface';
 
 export enum EthereumAccountRole {
   signer = 'signer',
 }
 
 type EthereumAccounts = {
-  signer: {
+  [EthereumAccountRole.signer]: {
     privateKey?: Buffer;
     address?: string;
+    nonce?: number;
   };
 };
 
@@ -51,5 +53,19 @@ export class EthereumAccountsService {
 
     this.accounts[role].address = addressBuffer.toString('utf-8');
     return this.accounts[role].address;
+  }
+
+  async getNonce(
+    role: EthereumAccountRole,
+    web3Service: IWeb3Service,
+  ): Promise<number> {
+    if (this.accounts[role].nonce) {
+      return this.accounts[role].nonce + 1;
+    }
+
+    const nonce = await web3Service.getTransactionCount(this.getAddress(role));
+
+    this.accounts[role].nonce = nonce;
+    return this.accounts[role].nonce;
   }
 }

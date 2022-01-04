@@ -1,3 +1,5 @@
+import { TxData } from '@ethereumjs/tx';
+import BigNumber from 'bignumber.js';
 import {
   setLengthLeft,
   toBuffer,
@@ -37,4 +39,22 @@ export const hash = (message: Buffer) => {
 export const sign = (msgHash: string, privateKey: Buffer) => {
   const { v, r, s } = ecsign(toBuffer(msgHash), privateKey);
   return { v, r: bufferToHex(r), s: bufferToHex(s) };
+};
+
+export const createTxData = (obj: {
+  to: string;
+  gasLimit: string;
+  gasPrice: BigNumber;
+  value: BigNumber;
+  data: string;
+  nonce: number;
+}): TxData => {
+  return {
+    to: obj.to,
+    gasLimit: `0x${new BigNumber(obj.gasLimit).toString(16)}`,
+    gasPrice: `0x${new BigNumber(obj.gasPrice).toString(16)}`,
+    value: `0x${new BigNumber(obj.value).toString(16)}`,
+    data: obj.data,
+    nonce: `0x${new BigNumber(obj.nonce).toString(16)}`,
+  };
 };

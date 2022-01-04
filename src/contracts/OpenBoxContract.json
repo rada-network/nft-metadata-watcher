@@ -55,7 +55,7 @@
         {
           "indexed": true,
           "internalType": "uint256",
-          "name": "tokenId",
+          "name": "newTokenId",
           "type": "uint256"
         }
       ],
@@ -103,7 +103,7 @@
           "type": "uint256"
         },
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "uint256",
           "name": "typeRarity",
           "type": "uint256"
@@ -139,7 +139,17 @@
         },
         {
           "internalType": "address",
-          "name": "_addressItem",
+          "name": "_nftAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "_isBoxNFT",
+          "type": "bool"
+        },
+        {
+          "internalType": "address",
+          "name": "_tokenAddress",
           "type": "address"
         }
       ],
@@ -183,7 +193,7 @@
         },
         {
           "internalType": "uint256",
-          "name": "_tokenId",
+          "name": "_boxesId",
           "type": "uint256"
         }
       ],
@@ -222,7 +232,7 @@
         },
         {
           "internalType": "address",
-          "name": "addressItem",
+          "name": "nftAddress",
           "type": "address"
         },
         {
@@ -239,6 +249,16 @@
           "internalType": "uint32",
           "name": "totalOpen",
           "type": "uint32"
+        },
+        {
+          "internalType": "bool",
+          "name": "isBoxNFT",
+          "type": "bool"
+        },
+        {
+          "internalType": "address",
+          "name": "tokenAddress",
+          "type": "address"
         }
       ],
       "stateMutability": "view",
@@ -319,7 +339,7 @@
         },
         {
           "internalType": "address",
-          "name": "_addressItem",
+          "name": "_nftAddress",
           "type": "address"
         },
         {
@@ -331,6 +351,16 @@
           "internalType": "uint32",
           "name": "_endId",
           "type": "uint32"
+        },
+        {
+          "internalType": "bool",
+          "name": "_isBoxNFT",
+          "type": "bool"
+        },
+        {
+          "internalType": "address",
+          "name": "_tokenAddress",
+          "type": "address"
         }
       ],
       "name": "updatePool",
@@ -404,7 +434,7 @@
             {
               "indexed": true,
               "internalType": "uint256",
-              "name": "tokenId",
+              "name": "newTokenId",
               "type": "uint256"
             }
           ],
@@ -412,7 +442,7 @@
           "type": "event"
         }
       },
-      "address": "0xbA92132B464af8BC073fA1a7a518b32298435d68"
+      "address": "0x2da63e30F846E2Dc9bF7A6982E8e7F805C89b67b"
     }
   }
 }
