@@ -1,4 +1,3 @@
-import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { PolygonLogsWatcherService } from 'src/modules/polygon_logs_watcher/polygon_logs_watcher.service';
 import { AppModule } from '../app.modules/polygon_logs_watcher.module';
@@ -16,11 +15,8 @@ async function bootstrap() {
     ...loggerInstance,
   });
   const service = await app.resolve(PolygonLogsWatcherService);
-  const config = await app.resolve(ConfigService);
-  await service.getAllLogs(
-    // TODO: consider computing scanStartBlock
-    parseInt(config.get('polygon.scanStartBlock'), 10),
-  );
+
+  await service.getAllLogs();
 }
 
 bootstrap();

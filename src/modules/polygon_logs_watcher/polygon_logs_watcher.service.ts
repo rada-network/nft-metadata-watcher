@@ -42,11 +42,26 @@ export class PolygonLogsWatcherService {
 
   private readonly logger = new Logger(PolygonLogsWatcherService.name);
 
-  async getAllLogs(fromBlock: number) {
-    await this.getLogs(fromBlock).catch((e) => {
+  async getAllLogs() {
+    try {
+      let startBlock;
+      const startBlockStr = this.configService.get('polygon.scanStartBlock');
+      if (startBlockStr) {
+        startBlock = parseInt(startBlockStr, 10);
+      } else {
+        startBlock =
+          (await this.polygonWeb3Service.getBlockNumber()) -
+          parseInt(
+            this.configService.get('polygon.scanFromBackLatestBlock'),
+            10,
+          );
+      }
+
+      await this.getLogs(startBlock);
+    } catch (e) {
       this.logger.error(`CRASH polygon watcher: ${e}`);
       throw e;
-    });
+    }
   }
 
   private async getLogs(fromBlock: number): Promise<void> {

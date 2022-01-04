@@ -1,4 +1,3 @@
-import { TxData } from '@ethereumjs/tx';
 import { Inject, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { IWeb3Service } from 'src/common/web3/web3.service.interface';
@@ -42,11 +41,23 @@ export class BscLogsWatcherService {
 
   private readonly logger = new Logger(BscLogsWatcherService.name);
 
-  async getAllLogs(fromBlock: number) {
-    await this.getLogs(fromBlock).catch((e) => {
+  async getAllLogs() {
+    try {
+      let startBlock;
+      const startBlockStr = this.configService.get('bsc.scanStartBlock');
+      if (startBlockStr) {
+        startBlock = parseInt(startBlockStr, 10);
+      } else {
+        startBlock =
+          (await this.bscWeb3Service.getBlockNumber()) -
+          parseInt(this.configService.get('bsc.scanFromBackLatestBlock'), 10);
+      }
+
+      await this.getLogs(startBlock);
+    } catch (e) {
       this.logger.error(`CRASH bsc watcher: ${e}`);
       throw e;
-    });
+    }
   }
 
   private async getLogs(fromBlock: number): Promise<void> {
