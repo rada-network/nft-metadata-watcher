@@ -6,16 +6,66 @@
 // TODO: add Dockerfile, kubernetes-deployment files.
 // TODO: secure privateKey in /data directory
 // TODO: fire error log to chat app for monitoring.
-// TODO: optimize get nonce to speedup send transactions.
-// TODO: check nonce conflict.
-// TODO: discuss updateNFT func weakness.
+// TODO: optimize get nonce to speedup send transactions. (DONE optimization ver 1)
+// TODO: check nonce conflict. (DONE attempt 1)
+
+## Enviroment variable description:
+
+NFT_METADATA_PATH
+
+- Directory storing metadata json files.
+
+ETHEREUM_ACCOUNTS_PATH
+
+- Directory storing private key and address for signer.
+- For example:
+  - ./accounts/signer/privateKey - Storing account private key plain text.
+  - ./accounts/signer/address -Storing account address plain text.
+
+POLYGON_URL
+POLYGON_CHAIN_ID
+POLYGON_NETWORK_ID
+
+- Polygon RPC and chain info.
+
+POLYGON_SCAN_FROM_BACK_LATEST_BLOCK
+
+- Start scan from (latest_block - back_block)
+
+POLYGON_SCAN_START_BLOCK
+
+- Set scan from block manually. If this env variable is not empty, it'll overide POLYGON_SCAN_FROM_BACK_LATEST_BLOCK flow.
+
+POLYGON_DELAY_CONFIRMED_BLOCKS
+
+- Scan to (latest_block - delay_block)
+
+POLYGON_SLEEP_TIME
+
+- When not finding newest block, sleep for miliseconds.
+
+BSC_xxx env variables are similar to polygon counterparts.
+
+## Contract ABI and event info
+
+Look at src/contracts directory.
 
 ## Local:
 
 ```sh
 yarn install
-# Run watcher
-yarn start:watcher:dev
+
+# Prepare account signer private key and address
+# ./accounts/signer/privateKey - Storing account private key plain text.
+# ./accounts/signer/address -Storing account address plain text.
+
+# Set appropriate environments variables in .env.development file.
+
+# Run polygon watcher
+start:polygon_logs_watcher:dev
+
+# Open another terminal, run bsc watcher
+start:bsc_logs_watcher:dev
 ```
 
 <p align="center">
