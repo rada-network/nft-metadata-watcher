@@ -23,7 +23,6 @@ import {
   REQUEST_RANDOM_NUMBER_GAS_LIMIT,
 } from 'src/common/contracts/RandomizeByRarityContract';
 import BigNumber from 'bignumber.js';
-import { openBoxToRandomizeByRarityPool } from 'src/common/contracts/utils/pool_mapping';
 
 const MAXIMUM_SCANNING_BLOCKS = 40;
 
@@ -164,8 +163,6 @@ export class BscLogsWatcherService {
     gasPrice: BigNumber;
   }): Promise<boolean> {
     try {
-      const randomizePoolId = openBoxToRandomizeByRarityPool(poolId);
-
       const basePath = this.configService.get('nftMetadata.path');
       const poolDirectoryPath = `${basePath}/${poolId}`;
       const filePath = `${poolDirectoryPath}/${tokenId}.json`;
@@ -182,7 +179,7 @@ export class BscLogsWatcherService {
         gasLimit: REQUEST_RANDOM_NUMBER_GAS_LIMIT,
         gasPrice,
         value: new BigNumber(0),
-        data: requestRandomNumber(polygonNetworkId, randomizePoolId, tokenId),
+        data: requestRandomNumber(polygonNetworkId, poolId, tokenId),
         nonce: this.ethereumAccountsService.getNonce(
           EthereumAccountRole.signer,
         ),

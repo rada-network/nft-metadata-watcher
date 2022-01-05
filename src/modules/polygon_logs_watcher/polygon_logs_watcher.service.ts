@@ -11,8 +11,8 @@ import {
   toBufferFromString,
   toNumber,
 } from 'src/common/ethereum_util/ethereum.util';
-import { existsSync } from 'fs';
-import { mkdir, writeFile } from 'fs/promises';
+import { existsSync, mkdirSync } from 'fs';
+import { writeFile } from 'fs/promises';
 import BigNumber from 'bignumber.js';
 import {
   getOpenBoxContractAddress,
@@ -23,7 +23,6 @@ import {
   EthereumAccountRole,
   EthereumAccountsService,
 } from 'src/common/ethereum_accounts/ethereum_accounts.service';
-import { randomizeByRarityToOpenBoxPool } from 'src/common/contracts/utils/pool_mapping';
 
 const MAXIMUM_SCANNING_BLOCKS = 40;
 
@@ -136,14 +135,14 @@ export class PolygonLogsWatcherService {
         const dataBuffer = toBufferFromString(data);
         const poolId = toNumber(dataBuffer.slice(0, 32));
 
-        const itemId = toNumber(dataBuffer.slice(32, 64));
+        const tokenId = toNumber(dataBuffer.slice(32, 64));
 
         const result = toNumber(dataBuffer.slice(64, 96));
 
         return {
           transactionHash,
           poolId,
-          itemId,
+          tokenId,
           result,
           gasPrice,
         };
@@ -157,22 +156,20 @@ export class PolygonLogsWatcherService {
   private async handleDiceLandedLogData({
     transactionHash,
     poolId,
-    itemId,
+    tokenId,
     result,
     gasPrice,
   }: {
     transactionHash: string;
     poolId: number;
-    itemId: number;
+    tokenId: number;
     result: number;
     gasPrice: BigNumber;
   }): Promise<boolean> {
     try {
-      const openBoxPoolId = randomizeByRarityToOpenBoxPool(poolId);
-
       const basePath = this.configService.get('nftMetadata.path');
-      const poolDirectoryPath = `${basePath}/${openBoxPoolId}`;
-      const filePath = `${poolDirectoryPath}/${itemId}.json`;
+      const poolDirectoryPath = `${basePath}/${poolId}`;
+      const filePath = `${poolDirectoryPath}/${tokenId}.json`;
 
       // TODO: optimize
       const isFileExisted = existsSync(filePath);
@@ -183,7 +180,7 @@ export class PolygonLogsWatcherService {
       // TODO: init folder.
       const isPoolDirectoryExisted = existsSync(poolDirectoryPath);
       if (!isPoolDirectoryExisted) {
-        throw new Error(`${poolDirectoryPath} directory not existed`);
+        mkdirSync(poolDirectoryPath);
       }
 
       // TODO: handle send back request to OpenBox contract.
@@ -193,7 +190,7 @@ export class PolygonLogsWatcherService {
         gasLimit: UPDATE_NFT_NUMBER_GAS_LIMIT,
         gasPrice,
         value: new BigNumber(0),
-        data: updateNFT(bscNetworkId, openBoxPoolId, itemId, result),
+        data: updateNFT(bscNetworkId, poolId, tokenId, result),
         nonce: this.ethereumAccountsService.getNonce(
           EthereumAccountRole.signer,
         ),
@@ -209,12 +206,12 @@ export class PolygonLogsWatcherService {
       // send tx
       const hash = await this.bscWeb3Service.send(signedTx);
       this.logger.log(
-        `updateNFT(poolId=${openBoxPoolId}, tokenId=${itemId}) txHash: ${hash}`,
+        `updateNFT(poolId=${poolId}, tokenId=${tokenId}) txHash: ${hash}`,
       );
 
       const json = JSON.stringify({
-        poolId: openBoxPoolId,
-        itemId,
+        poolId,
+        tokenId,
         rarity: result,
       });
       await writeFile(filePath, json, 'utf-8');

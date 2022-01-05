@@ -1,9 +1,43 @@
 {
   "abi": [
     {
-      "inputs": [],
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_linkToken",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_vrfCoordinator",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes32",
+          "name": "_keyHash",
+          "type": "bytes32"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_fee",
+          "type": "uint256"
+        }
+      ],
       "stateMutability": "nonpayable",
       "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "poolId",
+          "type": "uint256"
+        }
+      ],
+      "name": "AddPool",
+      "type": "event"
     },
     {
       "anonymous": false,
@@ -84,20 +118,20 @@
           "type": "uint256"
         }
       ],
-      "name": "PoolCreated",
+      "name": "UpdatePool",
       "type": "event"
     },
     {
       "inputs": [
         {
+          "internalType": "uint256",
+          "name": "_poolId",
+          "type": "uint256"
+        },
+        {
           "internalType": "string",
           "name": "_title",
           "type": "string"
-        },
-        {
-          "internalType": "address",
-          "name": "_caller",
-          "type": "address"
         },
         {
           "internalType": "uint256[]",
@@ -147,11 +181,6 @@
               "type": "string"
             },
             {
-              "internalType": "address",
-              "name": "caller",
-              "type": "address"
-            },
-            {
               "internalType": "uint256",
               "name": "total",
               "type": "uint256"
@@ -167,22 +196,9 @@
               "type": "uint256[]"
             }
           ],
-          "internalType": "struct RadomizeByRarity.Pool",
+          "internalType": "struct RandomizeByRarity.Pool",
           "name": "",
           "type": "tuple"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "getPoolCount",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -220,6 +236,35 @@
           "internalType": "address",
           "name": "",
           "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "pools",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "title",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256",
+          "name": "total",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "count",
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -327,6 +372,29 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_poolId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "string",
+          "name": "_title",
+          "type": "string"
+        },
+        {
+          "internalType": "uint256[]",
+          "name": "_rarity",
+          "type": "uint256[]"
+        }
+      ],
+      "name": "updatePool",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "withdrawLink",
       "outputs": [],
@@ -363,7 +431,7 @@
           "type": "event"
         }
       },
-      "address": "0xB95397048726DC3989FBF976720263dbfFa42793"
+      "address": "0x04e2ef94a049c77ffEF48cEC03A9fdb9240c559b"
     }
   }
 }
