@@ -23,4 +23,8 @@ export default () => ({
     delayConfirmedBlocks: process.env.BSC_DELAY_CONFIRMED_BLOCKS,
     sleepTime: process.env.BSC_SLEEP_TIME,
   },
+  redis: {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT,
+  },
 });

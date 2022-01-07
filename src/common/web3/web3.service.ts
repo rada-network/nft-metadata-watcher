@@ -18,6 +18,10 @@ export abstract class Web3Service implements IWeb3Service {
     return this.web3.eth.getTransactionCount(address, 'pending');
   }
 
+  decodeParameters(inputs: any, data: any): any {
+    return this.web3.eth.abi.decodeParameters(inputs, data);
+  }
+
   async getGasPrice(): Promise<BigNumber> {
     return new BigNumber(await this.web3.eth.getGasPrice());
   }

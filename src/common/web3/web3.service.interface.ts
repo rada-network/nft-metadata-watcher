@@ -21,6 +21,8 @@ export interface IWeb3Service {
 
   getPastLogs(params: PastLogsOptions): Promise<Log[]>;
 
+  decodeParameters(inputs: any, data: any): any;
+
   getBlock(
     blockHashOrBlockNumber: string | number,
   ): Promise<BlockTransactionString>;
