@@ -69,6 +69,7 @@ export class BscAuctionWatcherService {
 
     if (confirmedBlockNumber < fromBlock) {
       await new Promise((res): void => {
+        this.logger.log('Sleep...zzz');
         setTimeout(() => {
           res(() => `sleeped`);
         }, this.configService.get('bsc.sleepTime'));
@@ -80,7 +81,7 @@ export class BscAuctionWatcherService {
       confirmedBlockNumber,
       fromBlock + MAXIMUM_SCANNING_BLOCKS,
     );
-    //this.logger.log(`scan block from ${fromBlock} to ${toBlock}`);
+    this.logger.log(`scan block from ${fromBlock} to ${toBlock}`);
 
     const networkId = this.configService.get('bsc.networkId');
 
@@ -138,7 +139,7 @@ export class BscAuctionWatcherService {
         const { buyerAddress, quantity, priceEach } = params;
         const quantityInt = web3.utils.toNumber(quantity);
         const priceInt = web3.utils.fromWei(priceEach);
-        console.log(buyerAddress, quantityInt, priceInt, logIndex);
+        ///console.log(buyerAddress, quantityInt, priceInt, logIndex);
         this.addAccountBidToRedis(buyerAddress, poolId);
       },
       { concurrency: 3 },
@@ -179,6 +180,7 @@ export class BscAuctionWatcherService {
         const { buyerAddress, quantity, priceEach } = params;
         const quantityInt = web3.utils.toNumber(quantity);
         const priceInt = web3.utils.fromWei(priceEach);
+        console.log(buyerAddress, quantityInt, priceInt, logIndex);
         this.addAccountBidToRedis(buyerAddress, poolId);
       },
       { concurrency: 3 },
