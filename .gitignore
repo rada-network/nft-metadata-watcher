@@ -402,3 +402,5 @@ nft-meta-data/
 
 # ethereum-accounts
 accounts/
+
+docker/mysql/data/

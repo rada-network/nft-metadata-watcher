@@ -1,0 +1,13 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:8.0.24
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: rada
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    ports:
+      - 3306:3306
