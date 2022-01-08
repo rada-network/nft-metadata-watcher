@@ -34,6 +34,7 @@ export class OpenBox {
   @Column({ length: 66, nullable: true })
   public randomEventTransactionHash: string | null;
 
+  // CONSIDER: make poolId and tokenId as composite key
   @Column()
   @Index()
   readonly poolId: number;

@@ -129,29 +129,25 @@ export class BscLogsWatcherService {
 
     let gasPrice;
     if (openBoxLogs.length > 0) {
-      // TODO: consider use separate transaction creator for optimizing send tx.
+      // CONSIDER: use separate transaction creator for optimizing send tx.
       gasPrice = await this.polygonWeb3Service.getGasPrice();
       this.logger.log(`gasPrice: 0x${gasPrice.toString(16)}`);
     }
 
-    await Promise.map(
-      openBoxLogs,
-      ({ transactionHash, topics, data }) => {
-        const poolId = toNumber(toBufferFromString(topics[1]));
-        const tokenId = toNumber(toBufferFromString(topics[2]));
-        const dataBuffer = toBufferFromString(data);
-        const buyerAddress = toAddressString(dataBuffer.slice(0, 32));
+    await Promise.map(openBoxLogs, ({ transactionHash, topics, data }) => {
+      const poolId = toNumber(toBufferFromString(topics[1]));
+      const tokenId = toNumber(toBufferFromString(topics[2]));
+      const dataBuffer = toBufferFromString(data);
+      const buyerAddress = toAddressString(dataBuffer.slice(0, 32));
 
-        return {
-          transactionHash,
-          buyerAddress,
-          poolId,
-          tokenId,
-          gasPrice,
-        };
-      },
-      { concurrency: 3 },
-    ).map(this.handleOpenBoxLogData.bind(this));
+      return {
+        transactionHash,
+        buyerAddress,
+        poolId,
+        tokenId,
+        gasPrice,
+      };
+    }).map(this.handleOpenBoxLogData.bind(this), { concurrency: 3 });
 
     // TODO: add warning except log.
   }
@@ -188,20 +184,21 @@ export class BscLogsWatcherService {
           transactionHash=${transactionHash}`,
         );
       }
+
       const polygonNetworkId = this.configService.get('polygon.networkId');
       const transactionRequest =
         await this.transactionRequestService.createTransactionRequest<PolygonTransactionRequest>(
           TransactionRequestRepository.polygon,
           queryRunner,
           {
+            from: this.ethereumAccountsService.getAddress(
+              EthereumAccountRole.signer,
+            ),
             to: getRandomizeByRarityContractAddress(polygonNetworkId),
             gasLimit: REQUEST_RANDOM_NUMBER_GAS_LIMIT,
             gasPrice,
             value: new BigNumber(0),
             data: requestRandomNumber(polygonNetworkId, poolId, tokenId),
-            nonce: this.ethereumAccountsService.getNonce(
-              EthereumAccountRole.signer,
-            ),
           },
         );
       await this.openBoxService.createOpenBox(
@@ -216,6 +213,11 @@ export class BscLogsWatcherService {
       );
 
       await this.transaction.commit(queryRunner);
+
+      this.logger
+        .log(`Finished hanlde this OpenBox event - poolId=${poolId} tokenId=${tokenId} 
+          transactionHash=${transactionHash}`);
+
       return true;
     } catch (e) {
       await this.transaction.rollback(queryRunner);

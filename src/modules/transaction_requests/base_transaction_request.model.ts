@@ -36,10 +36,6 @@ export abstract class BaseTransactionRequest {
   @Index()
   public deletedAt: Date | null;
 
-  @Column({ nullable: true, length: 66 })
-  @Index({ unique: true })
-  public hash: string;
-
   @Column({ length: 42 })
   readonly from: string;
 
@@ -58,8 +54,8 @@ export abstract class BaseTransactionRequest {
   @Column({ type: 'text', nullable: false })
   readonly data: string;
 
-  @Column({ nullable: true })
-  public nonce: number;
+  @Column({ nullable: true, default: null })
+  public nonce: number | null = null;
 
   // eslint-disable-next-line @typescript-eslint/no-inferrable-types
   @Column({ default: 0 })

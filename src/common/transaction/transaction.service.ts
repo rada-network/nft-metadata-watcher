@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Connection, EntityManager, QueryRunner } from 'typeorm';
+import { Connection, QueryRunner } from 'typeorm';
 import { IsolationLevel } from 'typeorm/driver/types/IsolationLevel';
 import { TransactionInterface } from './transaction.interface';
 
