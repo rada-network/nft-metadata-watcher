@@ -24,7 +24,7 @@ import BigNumber from 'bignumber.js';
 import { TransactionInterface } from 'src/common/transaction/transaction.interface';
 import { OpenBoxService } from '../open_box/open_box.service';
 import {
-  TransactionRequestRepository,
+  TransactionRequestType,
   TransactionRequestService,
 } from '../transaction_requests/transaction_request.service';
 import { WarningError } from 'src/common/errors/warning_error';
@@ -188,7 +188,7 @@ export class BscLogsWatcherService {
       const polygonNetworkId = this.configService.get('polygon.networkId');
       const transactionRequest =
         await this.transactionRequestService.createTransactionRequest<PolygonTransactionRequest>(
-          TransactionRequestRepository.polygon,
+          TransactionRequestType.polygon,
           queryRunner,
           {
             from: this.ethereumAccountsService.getAddress(
@@ -222,9 +222,13 @@ export class BscLogsWatcherService {
     } catch (e) {
       await this.transaction.rollback(queryRunner);
       if (e instanceof WarningError) {
-        this.logger.warn(`handleOpenBoxLogData warning: ${e}`);
+        this.logger
+          .warn(`handleOpenBoxLogData - poolId=${poolId} tokenId=${tokenId} 
+          transactionHash=${transactionHash} - warning: ${e}`);
       } else {
-        this.logger.error(`handleOpenBoxLogData error: ${e}`);
+        this.logger
+          .error(`handleOpenBoxLogData - poolId=${poolId} tokenId=${tokenId} 
+          transactionHash=${transactionHash} - error: ${e}`);
       }
     }
   }

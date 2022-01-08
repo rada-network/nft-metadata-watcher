@@ -9,9 +9,6 @@ import {
 } from 'typeorm';
 import { ethValueFeeColumnOptions } from '../../common/typeorm_columns_option/columnOptions';
 
-// 250GWei
-export const GAS_PRICE_LIMIT = new BigNumber(250000000000);
-
 export const MAX_ATTEMPTS = 5;
 
 export enum TransactionRequestStatus {
@@ -36,6 +33,10 @@ export abstract class BaseTransactionRequest {
   @Index()
   public deletedAt: Date | null;
 
+  @Column({ nullable: true, length: 66 })
+  @Index({ unique: true })
+  public hash: string;
+
   @Column({ length: 42 })
   readonly from: string;
 
@@ -59,7 +60,7 @@ export abstract class BaseTransactionRequest {
 
   // eslint-disable-next-line @typescript-eslint/no-inferrable-types
   @Column({ default: 0 })
-  public attemp: number = 0;
+  public attempt: number = 0;
 
   @Column({
     type: 'enum',

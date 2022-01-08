@@ -19,6 +19,10 @@ export interface IWeb3Service {
 
   send(signedTx: string): Promise<string>;
 
+  sendPromiEvent(
+    signedTx: string,
+  ): Promise<{ hash: string; err: Error | null }>;
+
   getPastLogs(params: PastLogsOptions): Promise<Log[]>;
 
   decodeParameters(inputs: any, data: any): any;

@@ -72,6 +72,25 @@ export abstract class Web3Service implements IWeb3Service {
     );
   }
 
+  sendPromiEvent(
+    signedTx: string,
+  ): Promise<{ hash: string; err: Error | null }> {
+    let hashStr: string;
+    return new Promise((res, rej) =>
+      this.web3.eth
+        .sendSignedTransaction(signedTx, (err, hash) => {
+          if (err) return rej(err);
+          hashStr = hash;
+        })
+        .on('error', (err) => {
+          return res({ hash: hashStr, err });
+        })
+        .then((receipt) => {
+          return res({ hash: hashStr, err: null });
+        }),
+    );
+  }
+
   call(
     callObject: { to: string; data: string },
     defaultBlock: number | string = 'latest',

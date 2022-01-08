@@ -27,4 +27,7 @@ export default () => ({
     host: process.env.REDIS_HOST,
     port: process.env.REDIS_PORT,
   },
+  transactionCreator: {
+    sleepTime: process.env.TRANSACTION_CREATOR_SLEEP_TIME,
+  },
 });
