@@ -3,12 +3,10 @@ import { ConfigService } from '@nestjs/config';
 import { IWeb3Service } from 'src/common/web3/web3.service.interface';
 import { Promise } from 'bluebird';
 import {
-  createTxData,
   toAddressString,
   toBufferFromString,
   toNumber,
 } from 'src/common/ethereum_util/ethereum.util';
-import { existsSync } from 'fs';
 import {
   EthereumAccountRole,
   EthereumAccountsService,
@@ -23,13 +21,25 @@ import {
   REQUEST_RANDOM_NUMBER_GAS_LIMIT,
 } from 'src/common/contracts/RandomizeByRarityContract';
 import BigNumber from 'bignumber.js';
+import { TransactionInterface } from 'src/common/transaction/transaction.interface';
+import { OpenBoxService } from '../open_box/open_box.service';
+import {
+  TransactionRequestRepository,
+  TransactionRequestService,
+} from '../transaction_requests/transaction_request.service';
+import { WarningError } from 'src/common/errors/warning_error';
+import { PolygonTransactionRequest } from '../transaction_requests/polygon_transaction_request.model';
 
 const MAXIMUM_SCANNING_BLOCKS = 40;
 
 export class BscLogsWatcherService {
   constructor(
     private readonly configService: ConfigService,
+    private readonly openBoxService: OpenBoxService,
+    private readonly transactionRequestService: TransactionRequestService,
 
+    @Inject('TransactionInterface')
+    private readonly transaction: TransactionInterface,
     @Inject('BscWeb3Service')
     private readonly bscWeb3Service: IWeb3Service,
     @Inject('PolygonWeb3Service')
@@ -42,10 +52,7 @@ export class BscLogsWatcherService {
 
   async getAllLogs() {
     try {
-      // BAD CODE
-      await this.ethereumAccountsService.initNonce(this.polygonWeb3Service);
-
-      let startBlock;
+      let startBlock: number;
       const startBlockStr = this.configService.get('bsc.scanStartBlock');
       if (startBlockStr) {
         startBlock = parseInt(startBlockStr, 10);
@@ -87,7 +94,7 @@ export class BscLogsWatcherService {
 
     const networkId = this.configService.get('bsc.networkId');
 
-    //watch NftAuctionContract logs
+    //watch OpenBoxContract logs
     const watchOpenBoxContractLogsResult = this.watchOpenBoxContractLogs(
       fromBlock,
       toBlock,
@@ -162,45 +169,61 @@ export class BscLogsWatcherService {
     tokenId: number;
     gasPrice: BigNumber;
   }): Promise<boolean> {
-    try {
-      const basePath = this.configService.get('nftMetadata.path');
-      const poolDirectoryPath = `${basePath}/${poolId}`;
-      const filePath = `${poolDirectoryPath}/${tokenId}.json`;
-
-      // TODO: optimize
-      const isFileExisted = existsSync(filePath);
-      if (isFileExisted) {
-        throw new Error(`${filePath} existed`);
-      }
-
-      const polygonNetworkId = this.configService.get('polygon.networkId');
-      const txData = createTxData({
-        to: getRandomizeByRarityContractAddress(polygonNetworkId),
-        gasLimit: REQUEST_RANDOM_NUMBER_GAS_LIMIT,
-        gasPrice,
-        value: new BigNumber(0),
-        data: requestRandomNumber(polygonNetworkId, poolId, tokenId),
-        nonce: this.ethereumAccountsService.getNonce(
-          EthereumAccountRole.signer,
-        ),
+    const queryRunner = await this.transaction
+      .startTransaction()
+      .catch(async (e) => {
+        this.logger.error(`Failed to start transaction. ${e}`);
+        throw new Error('Failed to handleOpenBoxLogData.');
       });
-      this.logger.log(`txData: ${JSON.stringify(txData)}`);
 
-      const signedTx = this.polygonWeb3Service.sign(
-        txData,
-        this.ethereumAccountsService.getPrivateKey(EthereumAccountRole.signer),
-      );
-      this.logger.log(`signedTx: ${signedTx}`);
-
-      // send tx
-      const hash = await this.polygonWeb3Service.send(signedTx);
-      this.logger.log(
-        `requestRandomNumber(poolId=${poolId}, tokenId=${tokenId}) txHash: ${hash}`,
+    try {
+      const openBox = await this.openBoxService.getOpenBoxByPoolIdTokenId(
+        poolId,
+        tokenId,
       );
 
+      if (openBox) {
+        throw new WarningError(
+          `Hanlded this OpenBox event - poolId=${poolId} tokenId=${tokenId} 
+          transactionHash=${transactionHash}`,
+        );
+      }
+      const polygonNetworkId = this.configService.get('polygon.networkId');
+      const transactionRequest =
+        await this.transactionRequestService.createTransactionRequest<PolygonTransactionRequest>(
+          TransactionRequestRepository.polygon,
+          queryRunner,
+          {
+            to: getRandomizeByRarityContractAddress(polygonNetworkId),
+            gasLimit: REQUEST_RANDOM_NUMBER_GAS_LIMIT,
+            gasPrice,
+            value: new BigNumber(0),
+            data: requestRandomNumber(polygonNetworkId, poolId, tokenId),
+            nonce: this.ethereumAccountsService.getNonce(
+              EthereumAccountRole.signer,
+            ),
+          },
+        );
+      await this.openBoxService.createOpenBox(
+        queryRunner,
+        {
+          openBoxEventTransactionHash: transactionHash,
+          poolId,
+          tokenId,
+          randomTransactionRequest: transactionRequest,
+        },
+        false,
+      );
+
+      await this.transaction.commit(queryRunner);
       return true;
     } catch (e) {
-      this.logger.error(`handleOpenBoxLogData error: ${e}`);
+      await this.transaction.rollback(queryRunner);
+      if (e instanceof WarningError) {
+        this.logger.warn(`handleOpenBoxLogData warning: ${e}`);
+      } else {
+        this.logger.error(`handleOpenBoxLogData error: ${e}`);
+      }
     }
   }
 }
