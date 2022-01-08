@@ -17,11 +17,10 @@ export interface IWeb3Service {
 
   sign(txData: TxData, privateKey: Buffer): string;
 
-  send(signedTx: string): Promise<string>;
-
-  sendPromiEvent(
+  send(
     signedTx: string,
-  ): Promise<{ hash: string; err: Error | null }>;
+    onErrorCallback?: (err: Error) => Promise<boolean>,
+  ): Promise<string>;
 
   getPastLogs(params: PastLogsOptions): Promise<Log[]>;
 

@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { ethValueFeeColumnOptions } from '../../common/typeorm_columns_option/columnOptions';
 
-export const MAX_ATTEMPTS = 5;
+export const MAX_ATTEMPTS = 3;
 
 export enum TransactionRequestStatus {
   none = 'none',

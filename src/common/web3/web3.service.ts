@@ -61,32 +61,22 @@ export abstract class Web3Service implements IWeb3Service {
     return `0x${signedTx.serialize().toString('hex')}`;
   }
 
-  send(signedTx: string): Promise<string> {
+  send(
+    signedTx: string,
+    onErrorCallback?: (err: Error) => Promise<boolean>,
+  ): Promise<string> {
     return new Promise((res, rej) =>
       this.web3.eth
         .sendSignedTransaction(signedTx, (err, hash) => {
           if (err) return rej(err);
           return res(hash);
         })
-        .on('error', (err) => this.logger.error(`Send error:  ${err}`)),
-    );
-  }
-
-  sendPromiEvent(
-    signedTx: string,
-  ): Promise<{ hash: string; err: Error | null }> {
-    let hashStr: string;
-    return new Promise((res, rej) =>
-      this.web3.eth
-        .sendSignedTransaction(signedTx, (err, hash) => {
-          if (err) return rej(err);
-          hashStr = hash;
-        })
         .on('error', (err) => {
-          return res({ hash: hashStr, err });
-        })
-        .then((receipt) => {
-          return res({ hash: hashStr, err: null });
+          if (onErrorCallback) {
+            onErrorCallback(err);
+          } else {
+            this.logger.warn(`Send error: ${err}`);
+          }
         }),
     );
   }

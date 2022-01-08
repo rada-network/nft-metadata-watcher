@@ -75,7 +75,7 @@ export class TransactionRequestService {
         attempt: LessThan(MAX_ATTEMPTS),
         deletedAt: null,
       })
-      .orderBy('request.createdAt', 'ASC')
+      .orderBy('request.updatedAt', 'ASC')
       .take(GET_PENDING_REQUESTS_LIMIT)
       .getMany();
   }
@@ -89,7 +89,7 @@ export class TransactionRequestService {
       case TransactionRequestType.polygon:
         return this.polygonTransactionRequest as unknown as Repository<Type>;
       default:
-        throw new Error('Type mismatch.');
+        throw new Error('getRepository Type mismatch.');
     }
   }
 
@@ -100,7 +100,7 @@ export class TransactionRequestService {
       case TransactionRequestType.polygon:
         return PolygonTransactionRequest;
       default:
-        throw new Error('Type mismatch.');
+        throw new Error('getRepositoryClass Type mismatch.');
     }
   }
 }
