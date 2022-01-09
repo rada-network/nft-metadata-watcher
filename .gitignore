@@ -397,9 +397,6 @@ Temporary Items
 .env
 dist
 
-# nft-meta-data
-nft-meta-data/
-
 # ethereum-accounts
 accounts/
 

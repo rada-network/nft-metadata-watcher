@@ -7,13 +7,9 @@
 // TODO: secure privateKey in /data directory
 // TODO: fire error log to chat app for monitoring.
 // TODO: optimize get nonce to speedup send transactions. (DONE optimization ver 1)
-// TODO: check nonce conflict. (DONE attempt 1)
+// TODO: check nonce conflict. (DONE use transaction creator to get nonce)
 
 ## Enviroment variable description:
-
-NFT_METADATA_PATH
-
-- Directory storing metadata json files.
 
 ETHEREUM_ACCOUNTS_PATH
 

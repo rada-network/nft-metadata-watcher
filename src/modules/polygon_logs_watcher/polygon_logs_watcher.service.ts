@@ -154,10 +154,10 @@ export class PolygonLogsWatcherService {
         gasPrice,
       };
 
-      // TODO: set concurrency properly.
+      // CONSIDER: set concurrency properly.
     }).map(this.handleDiceLandedLogData.bind(this), { concurrency: 3 });
 
-    // TODO: add warning except log.
+    // CONSIDER: add warning except log.
   }
 
   private async handleDiceLandedLogData({
@@ -234,7 +234,7 @@ export class PolygonLogsWatcherService {
           rarity,
         }),
       );
-      const fileBuffer = await FileBuffer.fromBuffer(buffer);
+      const fileBuffer = await FileBuffer.fromJsonBuffer(buffer);
       const fileKey = `${poolId}/${tokenId}.${fileBuffer.ext}`;
       openBox.metadataUrl = this.s3Service.generateContentUrl(fileKey);
 

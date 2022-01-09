@@ -1,7 +1,4 @@
 export default () => ({
-  nftMetadata: {
-    path: process.env.NFT_METADATA_PATH,
-  },
   ethereum_accounts: {
     path: process.env.ETHEREUM_ACCOUNTS_PATH,
   },

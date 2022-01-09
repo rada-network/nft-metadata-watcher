@@ -39,6 +39,11 @@ export class FileBuffer {
     return new FileBuffer(buffer, types.ext, types.mime);
   }
 
+  static async fromJsonBuffer(buffer: Buffer): Promise<FileBuffer> {
+    const ext = 'json';
+    return new FileBuffer(buffer, ext, this.extToMime(ext));
+  }
+
   static extToMime(ext: string): string {
     switch (ext) {
       case 'jpg':

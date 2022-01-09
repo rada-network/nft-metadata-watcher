@@ -144,7 +144,7 @@ export class BscAuctionWatcherService {
       },
       { concurrency: 3 },
     );
-    // TODO: add warning except log.
+    // CONSIDER: add warning except log.
   }
 
   private async watchIncreaseBitLogs(
@@ -168,7 +168,7 @@ export class BscAuctionWatcherService {
     // this.logger.log(
     //   `scanned Increase bid event logs: ${JSON.stringify(increaseBidLogs)}`,
     // );
-    // TODO: add warning except log.
+    // CONSIDER: add warning except log.
     await Promise.map(
       increaseBidLogs,
       ({ transactionHash, topics, data, logIndex }) => {
@@ -185,7 +185,7 @@ export class BscAuctionWatcherService {
       },
       { concurrency: 3 },
     );
-    // TODO: add warning except log.
+    // CONSIDER: add warning except log.
   }
   async addAccountBidToRedis(account: string, poolId: number): Promise<any> {
     const networkId = this.configService.get('bsc.networkId');

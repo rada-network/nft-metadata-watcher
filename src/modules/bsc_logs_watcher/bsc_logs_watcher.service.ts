@@ -148,7 +148,7 @@ export class BscLogsWatcherService {
       };
     }).map(this.handleOpenBoxLogData.bind(this), { concurrency: 3 });
 
-    // TODO: add warning except log.
+    // CONSIDER: add warning except log.
   }
 
   private async handleOpenBoxLogData({

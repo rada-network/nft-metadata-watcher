@@ -24,7 +24,7 @@ export class S3Service implements S3Interface {
     this.logger.debug(`key: ${key}, region: ${region}`);
     // Use v2 because URLs generated using AWS SDK v3 do not work well with minio
     const credentials = new AWS.Credentials({
-      // TODO: vault
+      // TODO: vault for secure key, secret
       accessKeyId: key,
       secretAccessKey: secret,
     });
@@ -38,7 +38,7 @@ export class S3Service implements S3Interface {
   }
 
   generateContentUrl(key: string): string {
-    const bucketEndpoint = this.configService.get('s3.contentBucketEndpoint');
+    const bucketEndpoint = this.configService.get('s3.contentsBucketEndpoint');
     const url =
       process.env.NODE_ENV === 'development'
         ? `${bucketEndpoint}/${this.configService.get('s3.contentsBucket')}`
@@ -47,7 +47,7 @@ export class S3Service implements S3Interface {
   }
 
   getContentS3Key(baseUrl: string) {
-    const bucketEndpoint = this.configService.get('s3.contentBucketEndpoint');
+    const bucketEndpoint = this.configService.get('s3.contentsBucketEndpoint');
     const url =
       process.env.NODE_ENV === 'development'
         ? `${bucketEndpoint}/${this.configService.get('s3.contentsBucket')}`
