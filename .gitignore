@@ -403,4 +403,14 @@ nft-meta-data/
 # ethereum-accounts
 accounts/
 
+# Docker local infra
+docker/minio/data1/
+docker/minio/data2/
+docker/minio/data3/
+docker/minio/data4/
+docker/minio/data5/
+docker/minio/data6/
+docker/minio/data7/
+docker/minio/data8/
+docker/minio/data9/
 docker/mysql/data/
