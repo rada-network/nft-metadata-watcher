@@ -52,18 +52,18 @@ export class TransactionCreatorService {
   async createTransactions<Type extends BaseTransactionRequest>(
     type: TransactionRequestType,
   ): Promise<boolean> {
+    await new Promise((res): void => {
+      setTimeout(() => {
+        res(() => `sleeped`);
+      }, this.configService.get('transactionCreator.sleepTime'));
+    });
+
     const pendingTransactionRequests =
       await this.transactionRequestService.getPendingTransactionRequests<Type>(
         type,
       );
 
     if (pendingTransactionRequests.length === 0) {
-      await new Promise((res): void => {
-        setTimeout(() => {
-          res(() => `sleeped`);
-        }, this.configService.get('transactionCreator.sleepTime'));
-      });
-
       return true;
     }
 

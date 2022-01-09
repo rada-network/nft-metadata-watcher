@@ -56,6 +56,11 @@ export class TransactionRequestService {
       .setLock('pessimistic_write')
       .where({
         id,
+        status: In([
+          TransactionRequestStatus.none,
+          TransactionRequestStatus.failed,
+        ]),
+        attempt: LessThan(MAX_ATTEMPTS),
         deletedAt: null,
       })
       .getOne();
