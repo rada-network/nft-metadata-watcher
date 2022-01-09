@@ -245,7 +245,6 @@ export class PolygonLogsWatcherService {
       );
 
       await queryRunner.manager.save(openBox, { reload: false });
-
       await this.transaction.commit(queryRunner);
 
       this.logger
