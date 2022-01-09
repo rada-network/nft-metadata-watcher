@@ -11,3 +11,35 @@ services:
       - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
     ports:
       - 3306:3306
+  minio:
+    image: minio/minio:RELEASE.2022-01-08T03-11-54Z
+    container_name: minio
+    environment:
+      - MINIO_ROOT_USER=miniolocal
+      - MINIO_ROOT_PASSWORD=radalocal
+      - MINIO_REGION_NAME=us-east-1
+    entrypoint: sh
+    command: -c "
+      /opt/bin/minio server --console-address :9001 /mnt/data{1...8};"
+    volumes:
+      - ./docker/minio/:/mnt
+    ports:
+      - 9000:9000
+      - 9001:9001
+  setupminio:
+    image: minio/mc:RELEASE.2022-01-07T06-01-38Z
+    depends_on:
+      - minio
+    entrypoint: sh
+    command: -c "
+      until (/usr/bin/mc config host add rada http://minio:9000 miniolocal radalocal) do echo '...waiting...' && sleep 1; done;
+      /usr/bin/mc mb rada/contents;
+      /usr/bin/mc admin user add rada weak_authority_user weak_authority_user;
+      /usr/bin/mc admin user add rada rada_server rada_server;
+      /usr/bin/mc admin policy add rada/ policy_rada_server /mnt/policies/rada_server.json;
+      /usr/bin/mc admin policy set rada/ policy_rada_server user=rada_server;
+      /usr/bin/mc policy set-json /mnt/policies/contents_public.json rada/contents;
+      exit 0;
+      "
+    volumes:
+      - ./docker/minio/:/mnt
