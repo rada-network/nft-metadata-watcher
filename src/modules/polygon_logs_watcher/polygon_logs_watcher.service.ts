@@ -7,12 +7,9 @@ import {
 import { IWeb3Service } from 'src/common/web3/web3.service.interface';
 import { Promise } from 'bluebird';
 import {
-  createTxData,
   toBufferFromString,
   toNumber,
 } from 'src/common/ethereum_util/ethereum.util';
-import { existsSync, mkdirSync } from 'fs';
-import { writeFile } from 'fs/promises';
 import BigNumber from 'bignumber.js';
 import {
   getOpenBoxContractAddress,
@@ -23,29 +20,42 @@ import {
   EthereumAccountRole,
   EthereumAccountsService,
 } from 'src/common/ethereum_accounts/ethereum_accounts.service';
+import { OpenBoxService } from '../open_box/open_box.service';
+import {
+  TransactionRequestService,
+  TransactionRequestType,
+} from '../transaction_requests/transaction_request.service';
+import { TransactionInterface } from 'src/common/transaction/transaction.interface';
+import { WarningError } from 'src/common/errors/warning_error';
+import { BscTransactionRequest } from '../transaction_requests/bsc_transaction_request.model';
+import { FileBuffer } from 'src/common/fileBuffer/fileBuffer';
+import { S3Service } from 'src/common/s3/s3.service';
 
 const MAXIMUM_SCANNING_BLOCKS = 40;
 
 export class PolygonLogsWatcherService {
   constructor(
     private readonly configService: ConfigService,
+    private readonly openBoxService: OpenBoxService,
+    private readonly transactionRequestService: TransactionRequestService,
 
+    @Inject('TransactionInterface')
+    private readonly transaction: TransactionInterface,
     @Inject('PolygonWeb3Service')
     private readonly polygonWeb3Service: IWeb3Service,
     @Inject('BscWeb3Service')
     private readonly bscWeb3Service: IWeb3Service,
     @Inject('EthereumAccountsService')
     private readonly ethereumAccountsService: EthereumAccountsService,
+    @Inject('S3Interface')
+    private readonly s3Service: S3Service,
   ) {}
 
   private readonly logger = new Logger(PolygonLogsWatcherService.name);
 
   async getAllLogs() {
     try {
-      // BAD CODE
-      await this.ethereumAccountsService.initNonce(this.bscWeb3Service);
-
-      let startBlock;
+      let startBlock: number;
       const startBlockStr = this.configService.get('polygon.scanStartBlock');
       if (startBlockStr) {
         startBlock = parseInt(startBlockStr, 10);
@@ -90,7 +100,7 @@ export class PolygonLogsWatcherService {
 
     const networkId = this.configService.get('polygon.networkId');
 
-    //watch NftAuctionContract logs
+    //watch RandomizeByRarityContract logs
     const watchRandomizeByRarityContractLogsResult =
       this.watchRandomizeByRarityContractLogs(fromBlock, toBlock, networkId);
 
@@ -122,33 +132,30 @@ export class PolygonLogsWatcherService {
       `scanned diceLanded event logs: ${JSON.stringify(diceLandedLogs)}`,
     );
 
-    let gasPrice;
+    let gasPrice: BigNumber;
     if (diceLandedLogs.length > 0) {
-      // TODO: consider use separate transaction creator for optimizing send tx.
       gasPrice = await this.bscWeb3Service.getGasPrice();
       this.logger.log(`gasPrice: 0x${gasPrice.toString(16)}`);
     }
 
-    await Promise.map(
-      diceLandedLogs,
-      ({ transactionHash, data }) => {
-        const dataBuffer = toBufferFromString(data);
-        const poolId = toNumber(dataBuffer.slice(0, 32));
+    await Promise.map(diceLandedLogs, ({ transactionHash, data }) => {
+      const dataBuffer = toBufferFromString(data);
+      const poolId = toNumber(dataBuffer.slice(0, 32));
 
-        const tokenId = toNumber(dataBuffer.slice(32, 64));
+      const tokenId = toNumber(dataBuffer.slice(32, 64));
 
-        const result = toNumber(dataBuffer.slice(64, 96));
+      const result = toNumber(dataBuffer.slice(64, 96));
 
-        return {
-          transactionHash,
-          poolId,
-          tokenId,
-          result,
-          gasPrice,
-        };
-      },
-      { concurrency: 3 },
-    ).map(this.handleDiceLandedLogData.bind(this));
+      return {
+        transactionHash,
+        poolId,
+        tokenId,
+        rarity: result,
+        gasPrice,
+      };
+
+      // TODO: set concurrency properly.
+    }).map(this.handleDiceLandedLogData.bind(this), { concurrency: 3 });
 
     // TODO: add warning except log.
   }
@@ -157,68 +164,106 @@ export class PolygonLogsWatcherService {
     transactionHash,
     poolId,
     tokenId,
-    result,
+    rarity,
     gasPrice,
   }: {
     transactionHash: string;
     poolId: number;
     tokenId: number;
-    result: number;
+    rarity: number;
     gasPrice: BigNumber;
   }): Promise<boolean> {
+    const queryRunner = await this.transaction
+      .startTransaction()
+      .catch(async (e) => {
+        this.logger.error(`Failed to start transaction. ${e}`);
+        throw new Error('Failed to handleOpenBoxLogData.');
+      });
+
     try {
-      const basePath = this.configService.get('nftMetadata.path');
-      const poolDirectoryPath = `${basePath}/${poolId}`;
-      const filePath = `${poolDirectoryPath}/${tokenId}.json`;
+      const openBox =
+        await this.openBoxService.getOpenBoxByPoolIdTokenIdWithLock(
+          queryRunner,
+          poolId,
+          tokenId,
+        );
 
-      // TODO: optimize
-      const isFileExisted = existsSync(filePath);
-      if (isFileExisted) {
-        throw new Error(`${filePath} file existed`);
+      if (!openBox) {
+        throw new Error(
+          `OpenBox - poolId=${poolId},tokenId=${tokenId} - not found.`,
+        );
       }
 
-      // TODO: init folder.
-      const isPoolDirectoryExisted = existsSync(poolDirectoryPath);
-      if (!isPoolDirectoryExisted) {
-        mkdirSync(poolDirectoryPath);
+      if (
+        openBox.randomEventTransactionHash ||
+        openBox.rarity ||
+        openBox.metadataUrl ||
+        openBox.updateNftTransactionRequest
+      ) {
+        throw new WarningError(
+          `Handled DiceLandedLog of this OpenBox - poolId=${poolId},tokenId=${tokenId}.`,
+        );
       }
 
-      // TODO: handle send back request to OpenBox contract.
       const bscNetworkId = this.configService.get('bsc.networkId');
-      const txData = createTxData({
-        to: getOpenBoxContractAddress(bscNetworkId),
-        gasLimit: UPDATE_NFT_NUMBER_GAS_LIMIT,
-        gasPrice,
-        value: new BigNumber(0),
-        data: updateNFT(bscNetworkId, poolId, tokenId, result),
-        nonce: this.ethereumAccountsService.getNonce(
-          EthereumAccountRole.signer,
-        ),
-      });
-      this.logger.log(`txData: ${JSON.stringify(txData)}`);
+      const transactionRequest =
+        await this.transactionRequestService.createTransactionRequest<BscTransactionRequest>(
+          TransactionRequestType.bsc,
+          queryRunner,
+          {
+            from: this.ethereumAccountsService.getAddress(
+              EthereumAccountRole.signer,
+            ),
+            to: getOpenBoxContractAddress(bscNetworkId),
+            gasLimit: UPDATE_NFT_NUMBER_GAS_LIMIT,
+            gasPrice,
+            value: new BigNumber(0),
+            data: updateNFT(bscNetworkId, poolId, tokenId, rarity),
+          },
+        );
+      openBox.randomEventTransactionHash = transactionHash;
+      openBox.rarity = rarity;
+      openBox.updateNftTransactionRequest = transactionRequest;
 
-      const signedTx = this.bscWeb3Service.sign(
-        txData,
-        this.ethereumAccountsService.getPrivateKey(EthereumAccountRole.signer),
+      // Update to S3/minio
+      // TODO: match file format
+      const buffer = Buffer.from(
+        JSON.stringify({
+          poolId,
+          tokenId,
+          rarity,
+        }),
       );
-      this.logger.log(`signedTx: ${signedTx}`);
+      const fileBuffer = await FileBuffer.fromBuffer(buffer);
+      const fileKey = `${poolId}/${tokenId}.${fileBuffer.ext}`;
+      openBox.metadataUrl = this.s3Service.generateContentUrl(fileKey);
 
-      // send tx
-      const hash = await this.bscWeb3Service.send(signedTx);
-      this.logger.log(
-        `updateNFT(poolId=${poolId}, tokenId=${tokenId}) txHash: ${hash}`,
+      await this.s3Service.putFile(
+        this.s3Service.getContentBucketName(),
+        fileKey,
+        fileBuffer,
       );
 
-      const json = JSON.stringify({
-        poolId,
-        tokenId,
-        rarity: result,
-      });
-      await writeFile(filePath, json, 'utf-8');
+      await queryRunner.manager.save(openBox, { reload: false });
+
+      await this.transaction.commit(queryRunner);
+
+      this.logger
+        .log(`Finished hanlde this DiceLanded event - poolId=${poolId} tokenId=${tokenId} 
+          transactionHash=${transactionHash}`);
 
       return true;
     } catch (e) {
-      this.logger.error(`handleDiceLandedLogData error: ${e}`);
+      await this.transaction.rollback(queryRunner);
+      if (e instanceof WarningError) {
+        this.logger
+          .warn(`handleDiceLandedLogData - poolId=${poolId} tokenId=${tokenId} 
+          transactionHash=${transactionHash} - warning: ${e}`);
+      } else {
+        this.logger
+          .error(`handleDiceLandedLogData - poolId=${poolId} tokenId=${tokenId} 
+          transactionHash=${transactionHash} - error: ${e}`);
+      }
     }
   }
 }

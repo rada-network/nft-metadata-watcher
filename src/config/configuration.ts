@@ -30,4 +30,14 @@ export default () => ({
   transactionCreator: {
     sleepTime: process.env.TRANSACTION_CREATOR_SLEEP_TIME,
   },
+  s3: {
+    url: process.env.S3_URL,
+    internalUrl: process.env.S3_INTERNAL_URL,
+    region: process.env.S3_REGION,
+    contentsBucket: process.env.S3_CONTENTS_BUCKET,
+    contentsBucketEndpoint: process.env.S3_CONTENTS_BUCKET_ENDPOINT,
+    forcePathStyle: process.env.S3_FORCE_PATH_STYLE,
+    accountKey: process.env.S3_ACCOUNT_KEY,
+    accountSecret: process.env.S3_ACCOUNT_SECRET,
+  },
 });

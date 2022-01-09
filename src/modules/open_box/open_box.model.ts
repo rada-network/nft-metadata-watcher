@@ -67,5 +67,5 @@ export class OpenBox {
     (transactionRequest) => transactionRequest.openBox,
   )
   @JoinColumn({ name: 'update_nft_transaction_request_id' })
-  readonly updateNftTransactionRequest: BscTransactionRequest | null;
+  public updateNftTransactionRequest: BscTransactionRequest | null;
 }

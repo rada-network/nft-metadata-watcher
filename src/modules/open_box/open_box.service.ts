@@ -28,6 +28,35 @@ export class OpenBoxService {
       });
   }
 
+  async getOpenBoxByPoolIdTokenIdWithLock(
+    queryRunner: QueryRunner,
+    poolId: number,
+    tokenId: number,
+  ): Promise<OpenBox> {
+    return queryRunner.manager
+      .getRepository(OpenBox)
+      .createQueryBuilder('openBox')
+      .setLock('pessimistic_write')
+      .leftJoinAndSelect(
+        'openBox.randomTransactionRequest',
+        'randomTransactionRequest',
+      )
+      .leftJoinAndSelect(
+        'openBox.updateNftTransactionRequest',
+        'updateNftTransactionRequest',
+      )
+      .where({
+        poolId,
+        tokenId,
+        deletedAt: null,
+      })
+      .getOne()
+      .catch((e) => {
+        this.logger.error(`Failed to getOpenBoxByPoolIdTokenIdWithLock: ${e}`);
+        throw new Error('Failed to getOpenBoxByPoolIdTokenIdWithLock.');
+      });
+  }
+
   async createOpenBox(
     queryRunner: QueryRunner,
     entityLike: DeepPartial<OpenBox>,

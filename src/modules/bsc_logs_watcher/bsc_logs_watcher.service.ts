@@ -127,9 +127,8 @@ export class BscLogsWatcherService {
       `scanned OpenBox event logs: ${JSON.stringify(openBoxLogs)}`,
     );
 
-    let gasPrice;
+    let gasPrice: BigNumber;
     if (openBoxLogs.length > 0) {
-      // CONSIDER: use separate transaction creator for optimizing send tx.
       gasPrice = await this.polygonWeb3Service.getGasPrice();
       this.logger.log(`gasPrice: 0x${gasPrice.toString(16)}`);
     }
@@ -180,8 +179,8 @@ export class BscLogsWatcherService {
 
       if (openBox) {
         throw new WarningError(
-          `Hanlded this OpenBox event - poolId=${poolId} tokenId=${tokenId} 
-          transactionHash=${transactionHash}`,
+          `Hanlded this OpenBox event - poolId=${openBox.poolId} tokenId=${openBox.tokenId} 
+          transactionHash=${openBox.openBoxEventTransactionHash}`,
         );
       }
 
