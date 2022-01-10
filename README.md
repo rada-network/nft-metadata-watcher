@@ -51,6 +51,9 @@ Look at src/contracts directory.
 ```sh
 yarn install
 
+# Run in another terminal
+docker-compose up
+
 # Prepare account signer private key and address
 # ./accounts/signer/privateKey - Storing account private key plain text.
 # ./accounts/signer/address -Storing account address plain text.
@@ -62,6 +65,9 @@ start:polygon_logs_watcher:dev
 
 # Open another terminal, run bsc watcher
 start:bsc_logs_watcher:dev
+
+# Open another terminal, run transaction creator
+start:transaction_creator:dev
 ```
 
 <p align="center">
