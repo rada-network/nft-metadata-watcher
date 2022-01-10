@@ -11,7 +11,7 @@ const ENV = process.env.NODE_ENV;
     BscLogsWatcherModule,
     TypeOrmModule.forRoot(),
     ConfigModule.forRoot({
-      envFilePath: !ENV ? '.env.development' : `.env.${ENV}`,
+      envFilePath: ['.env', !ENV ? '.env.development' : `.env.${ENV}`],
       load: [configuration],
       isGlobal: true,
     }),
