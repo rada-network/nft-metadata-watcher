@@ -66,6 +66,25 @@ export class TransactionRequestService {
       .getOne();
   }
 
+  async getTransactionRequestByIdWithLock<Type extends BaseTransactionRequest>(
+    type: TransactionRequestType,
+    queryRunner: QueryRunner,
+    id: number,
+  ): Promise<Type> {
+    const repository = queryRunner.manager.getRepository(
+      this.getRepositoryClass(type),
+    ) as unknown as Repository<Type>;
+    return repository
+      .createQueryBuilder(type)
+      .useTransaction(false)
+      .setLock('pessimistic_write')
+      .where({
+        id,
+        deletedAt: null,
+      })
+      .getOne();
+  }
+
   async getPendingTransactionRequests<Type extends BaseTransactionRequest>(
     type: TransactionRequestType,
   ): Promise<Type[]> {

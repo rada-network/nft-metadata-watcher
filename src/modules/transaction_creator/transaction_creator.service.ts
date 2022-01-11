@@ -164,7 +164,7 @@ export class TransactionCreatorService {
 
     try {
       const lockedRequest =
-        await this.transactionRequestService.getPendingTransactionRequestByIdWithLock<Type>(
+        await this.transactionRequestService.getTransactionRequestByIdWithLock<Type>(
           type,
           queryRunner,
           transactionRequest.id,
