@@ -173,7 +173,7 @@ export class S3Service implements S3Interface {
     //https://nft-meta.rada.network/testnet/imgs/[poolid]/[rarity].jpg
 
     const env = process.env.NODE_ENV;
-    const baseUrl = 'https://nft-meta.rada.network/';
+    const baseUrl = 'https://nft-meta.rada.network';
     return `${baseUrl}/${
       env === 'development' ? 'testnet' : 'mainnet'
     }/imgs/${poolId}/${rarity}.jpg`;
