@@ -232,10 +232,14 @@ export class PolygonLogsWatcherService {
           poolId,
           tokenId,
           rarity,
+          image: this.s3Service.generateImageUrl(poolId, rarity),
+          name: this.s3Service.getRarityName(rarity),
         }),
       );
       const fileBuffer = await FileBuffer.fromJsonBuffer(buffer);
-      const fileKey = `${poolId}/${tokenId}.${fileBuffer.ext}`;
+      const fileKey = this.s3Service.generateFileKey(
+        `${tokenId}.${fileBuffer.ext}`,
+      );
       openBox.metadataUrl = this.s3Service.generateContentUrl(fileKey);
 
       await this.s3Service.putFile(
