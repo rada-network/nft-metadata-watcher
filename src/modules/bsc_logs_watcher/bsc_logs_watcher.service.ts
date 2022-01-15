@@ -29,6 +29,7 @@ import {
 } from '../transaction_requests/transaction_request.service';
 import { WarningError } from 'src/common/errors/warning_error';
 import { PolygonTransactionRequest } from '../transaction_requests/polygon_transaction_request.model';
+import { BotInterface } from 'src/common/bot/bot.interface';
 
 const MAXIMUM_SCANNING_BLOCKS = 40;
 
@@ -46,6 +47,8 @@ export class BscLogsWatcherService {
     private readonly polygonWeb3Service: IWeb3Service,
     @Inject('EthereumAccountsService')
     private readonly ethereumAccountsService: EthereumAccountsService,
+    @Inject('BotInterface')
+    private readonly botService: BotInterface,
   ) {}
 
   private readonly logger = new Logger(BscLogsWatcherService.name);

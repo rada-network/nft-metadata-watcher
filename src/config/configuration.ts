@@ -41,4 +41,8 @@ export default () => ({
   nftMetadata: {
     rarityBaseUrl: process.env.NFT_METADATA_RARITY_BASE_URL,
   },
+  telegram: {
+    botToken: process.env.TELEGRAM_BOT_TOKEN,
+    chatId: process.env.TELEGRAM_CHAT_ID,
+  },
 });

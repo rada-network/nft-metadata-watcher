@@ -2,6 +2,7 @@ import { Module, HttpModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BscLogsWatcherModule } from 'src/modules/bsc_logs_watcher/bsc_logs_watcher.module';
+import { LoggerModule } from 'src/modules/logger/logger.module';
 import configuration from '../config/configuration';
 
 const ENV = process.env.NODE_ENV;
@@ -16,6 +17,7 @@ const ENV = process.env.NODE_ENV;
       isGlobal: true,
     }),
     HttpModule,
+    LoggerModule,
   ],
 })
 export class AppModule {}
