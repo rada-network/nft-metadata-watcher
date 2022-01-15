@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Environment } from 'src/common/constants/constants';
 import { DeepPartial, QueryRunner, Repository } from 'typeorm';
 import { OpenBox } from './open_box.model';
 
@@ -72,7 +73,7 @@ export class OpenBoxService {
 
   public generateFileKey(key: string): string {
     const env = this.configService.get('env');
-    return `${env === 'development' ? 'dev' : 'prod'}/${key}`;
+    return `${env === Environment.production ? 'prod' : 'dev'}/${key}`;
   }
 
   /**
@@ -85,7 +86,7 @@ export class OpenBoxService {
     const env = this.configService.get('env');
     const baseUrl = this.configService.get('nftMetadata.rarityBaseUrl');
     return `${baseUrl}/${
-      env === 'development' ? 'testnet' : 'mainnet'
+      env === Environment.production ? 'mainnet' : 'testnet'
     }/imgs/${poolId}/${rarity}.jpg`;
   }
 

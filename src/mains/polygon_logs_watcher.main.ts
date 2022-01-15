@@ -1,12 +1,13 @@
 import { NestFactory } from '@nestjs/core';
+import { Environment } from 'src/common/constants/constants';
 import { PolygonLogsWatcherService } from 'src/modules/polygon_logs_watcher/polygon_logs_watcher.service';
 import { AppModule } from '../app.modules/polygon_logs_watcher.module';
 import { DebugMonoLogger, MonoLogger } from './Logger';
 
 const loggerInstance =
-  process.env.NODE_ENV === 'development'
+  process.env.NODE_ENV === Environment.development
     ? {}
-    : process.env.NODE_ENV === 'staging'
+    : process.env.NODE_ENV === Environment.staging
     ? { logger: new DebugMonoLogger() }
     : { logger: new MonoLogger() };
 
