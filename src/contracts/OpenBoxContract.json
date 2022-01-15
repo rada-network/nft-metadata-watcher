@@ -1,10 +1,6 @@
 {
   "abi": [
-    {
-      "inputs": [],
-      "stateMutability": "nonpayable",
-      "type": "constructor"
-    },
+    { "inputs": [], "stateMutability": "nonpayable", "type": "constructor" },
     {
       "anonymous": false,
       "inputs": [
@@ -87,6 +83,32 @@
         {
           "indexed": false,
           "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "Paused",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "Unpaused",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
           "name": "buyerAddress",
           "type": "address"
         },
@@ -127,26 +149,8 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "uint16",
-          "name": "_poolId",
-          "type": "uint16"
-        },
-        {
-          "internalType": "string",
-          "name": "_title",
-          "type": "string"
-        },
-        {
-          "internalType": "address",
-          "name": "_nftAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "bool",
-          "name": "_isBoxNFT",
-          "type": "bool"
-        },
+        { "internalType": "uint16", "name": "_poolId", "type": "uint16" },
+        { "internalType": "address", "name": "_nftAddress", "type": "address" },
         {
           "internalType": "address",
           "name": "_tokenAddress",
@@ -160,19 +164,44 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
+        { "internalType": "uint16", "name": "_poolId", "type": "uint16" }
       ],
-      "name": "admins",
+      "name": "getPool",
       "outputs": [
         {
-          "internalType": "bool",
+          "components": [
+            {
+              "internalType": "address",
+              "name": "nftAddress",
+              "type": "address"
+            },
+            { "internalType": "uint256", "name": "startId", "type": "uint256" },
+            { "internalType": "uint256", "name": "endId", "type": "uint256" },
+            { "internalType": "uint32", "name": "totalOpen", "type": "uint32" },
+            {
+              "internalType": "address",
+              "name": "tokenAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "startTime",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct NFTManContract.POOL_INFO",
           "name": "",
-          "type": "bool"
+          "type": "tuple"
         }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "getPoolIds",
+      "outputs": [
+        { "internalType": "uint16[]", "name": "", "type": "uint16[]" }
       ],
       "stateMutability": "view",
       "type": "function"
@@ -186,16 +215,17 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "uint16",
-          "name": "_poolId",
-          "type": "uint16"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_boxesId",
-          "type": "uint256"
-        }
+        { "internalType": "address", "name": "_address", "type": "address" }
+      ],
+      "name": "isAdmin",
+      "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint16", "name": "_poolId", "type": "uint16" },
+        { "internalType": "uint256", "name": "_numberBoxes", "type": "uint256" }
       ],
       "name": "openBox",
       "outputs": [],
@@ -205,62 +235,14 @@
     {
       "inputs": [],
       "name": "owner",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
       "stateMutability": "view",
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint16",
-          "name": "",
-          "type": "uint16"
-        }
-      ],
-      "name": "pools",
-      "outputs": [
-        {
-          "internalType": "string",
-          "name": "title",
-          "type": "string"
-        },
-        {
-          "internalType": "address",
-          "name": "nftAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "uint256",
-          "name": "startId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "endId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint32",
-          "name": "totalOpen",
-          "type": "uint32"
-        },
-        {
-          "internalType": "bool",
-          "name": "isBoxNFT",
-          "type": "bool"
-        },
-        {
-          "internalType": "address",
-          "name": "tokenAddress",
-          "type": "address"
-        }
-      ],
+      "inputs": [],
+      "name": "paused",
+      "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
       "stateMutability": "view",
       "type": "function"
     },
@@ -273,16 +255,8 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "address",
-          "name": "_addr",
-          "type": "address"
-        },
-        {
-          "internalType": "bool",
-          "name": "_allow",
-          "type": "bool"
-        }
+        { "internalType": "address", "name": "_addr", "type": "address" },
+        { "internalType": "bool", "name": "_allow", "type": "bool" }
       ],
       "name": "setAdmin",
       "outputs": [],
@@ -290,12 +264,15 @@
       "type": "function"
     },
     {
+      "inputs": [{ "internalType": "bool", "name": "_allow", "type": "bool" }],
+      "name": "setPause",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [
-        {
-          "internalType": "address",
-          "name": "newOwner",
-          "type": "address"
-        }
+        { "internalType": "address", "name": "newOwner", "type": "address" }
       ],
       "name": "transferOwnership",
       "outputs": [],
@@ -304,21 +281,9 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "uint16",
-          "name": "_poolId",
-          "type": "uint16"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_tokenId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint16",
-          "name": "_typeRarity",
-          "type": "uint16"
-        }
+        { "internalType": "uint16", "name": "_poolId", "type": "uint16" },
+        { "internalType": "uint256", "name": "_tokenId", "type": "uint256" },
+        { "internalType": "uint16", "name": "_typeRarity", "type": "uint16" }
       ],
       "name": "updateNFT",
       "outputs": [],
@@ -327,41 +292,16 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "uint16",
-          "name": "_poolId",
-          "type": "uint16"
-        },
-        {
-          "internalType": "string",
-          "name": "_title",
-          "type": "string"
-        },
-        {
-          "internalType": "address",
-          "name": "_nftAddress",
-          "type": "address"
-        },
-        {
-          "internalType": "uint32",
-          "name": "_startId",
-          "type": "uint32"
-        },
-        {
-          "internalType": "uint32",
-          "name": "_endId",
-          "type": "uint32"
-        },
-        {
-          "internalType": "bool",
-          "name": "_isBoxNFT",
-          "type": "bool"
-        },
+        { "internalType": "uint16", "name": "_poolId", "type": "uint16" },
+        { "internalType": "address", "name": "_nftAddress", "type": "address" },
+        { "internalType": "uint32", "name": "_startId", "type": "uint32" },
+        { "internalType": "uint32", "name": "_endId", "type": "uint32" },
         {
           "internalType": "address",
           "name": "_tokenAddress",
           "type": "address"
-        }
+        },
+        { "internalType": "uint256", "name": "_startTime", "type": "uint256" }
       ],
       "name": "updatePool",
       "outputs": [],
@@ -388,11 +328,7 @@
           "name": "newImplementation",
           "type": "address"
         },
-        {
-          "internalType": "bytes",
-          "name": "data",
-          "type": "bytes"
-        }
+        { "internalType": "bytes", "name": "data", "type": "bytes" }
       ],
       "name": "upgradeToAndCall",
       "outputs": [],
@@ -400,16 +336,17 @@
       "type": "function"
     },
     {
-      "inputs": [],
-      "name": "version",
-      "outputs": [
+      "inputs": [
         {
-          "internalType": "string",
-          "name": "",
-          "type": "string"
-        }
+          "internalType": "address",
+          "name": "_tokenAddress",
+          "type": "address"
+        },
+        { "internalType": "uint256", "name": "_amount", "type": "uint256" }
       ],
-      "stateMutability": "pure",
+      "name": "withdrawFund",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     }
   ],
@@ -442,7 +379,37 @@
           "type": "event"
         }
       },
-      "address": "0xF567103C1F846217C58995c205662F3ECF22302B"
+      "address": "0xf843f196B91287Ba594E6a06aEd89494C0C4aEAf"
+    },
+    "56": {
+      "events": {
+        "0x1642633618f2731e024d08a0865cb6584ac926969a05f26e442f0d301d1e107c": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "buyerAddress",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint16",
+              "name": "poolId",
+              "type": "uint16"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "newTokenId",
+              "type": "uint256"
+            }
+          ],
+          "name": "OpenBox",
+          "type": "event"
+        }
+      },
+      "address": "0xf843f196B91287Ba594E6a06aEd89494C0C4aEAf"
     }
   }
 }

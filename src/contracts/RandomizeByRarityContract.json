@@ -2,26 +2,14 @@
   "abi": [
     {
       "inputs": [
-        {
-          "internalType": "address",
-          "name": "_linkToken",
-          "type": "address"
-        },
+        { "internalType": "address", "name": "_linkToken", "type": "address" },
         {
           "internalType": "address",
           "name": "_vrfCoordinator",
           "type": "address"
         },
-        {
-          "internalType": "bytes32",
-          "name": "_keyHash",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_fee",
-          "type": "uint256"
-        }
+        { "internalType": "bytes32", "name": "_keyHash", "type": "bytes32" },
+        { "internalType": "uint256", "name": "_fee", "type": "uint256" }
       ],
       "stateMutability": "nonpayable",
       "type": "constructor"
@@ -123,19 +111,12 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_poolId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "string",
-          "name": "_title",
-          "type": "string"
-        },
+        { "internalType": "uint256", "name": "_poolId", "type": "uint256" },
+        { "internalType": "string", "name": "_title", "type": "string" },
+        { "internalType": "uint256[]", "name": "_rarity", "type": "uint256[]" },
         {
           "internalType": "uint256[]",
-          "name": "_rarity",
+          "name": "_rarityIds",
           "type": "uint256[]"
         }
       ],
@@ -146,57 +127,27 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
-      "name": "admins",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_poolId",
-          "type": "uint256"
-        }
+        { "internalType": "uint256", "name": "_poolId", "type": "uint256" }
       ],
       "name": "getPool",
       "outputs": [
         {
           "components": [
-            {
-              "internalType": "string",
-              "name": "title",
-              "type": "string"
-            },
-            {
-              "internalType": "uint256",
-              "name": "total",
-              "type": "uint256"
-            },
-            {
-              "internalType": "uint256",
-              "name": "count",
-              "type": "uint256"
-            },
+            { "internalType": "string", "name": "title", "type": "string" },
+            { "internalType": "uint256", "name": "total", "type": "uint256" },
+            { "internalType": "uint256", "name": "count", "type": "uint256" },
             {
               "internalType": "uint256[]",
               "name": "rarity",
               "type": "uint256[]"
+            },
+            {
+              "internalType": "uint256[]",
+              "name": "rarityIds",
+              "type": "uint256[]"
             }
           ],
-          "internalType": "struct RandomizeByRarity.Pool",
+          "internalType": "struct RandomizeByRarity.POOL_INFO",
           "name": "",
           "type": "tuple"
         }
@@ -205,83 +156,62 @@
       "type": "function"
     },
     {
+      "inputs": [],
+      "name": "getPoolIds",
+      "outputs": [
+        { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_poolId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_id",
-          "type": "uint256"
-        }
+        { "internalType": "uint256", "name": "_poolId", "type": "uint256" },
+        { "internalType": "uint256", "name": "_id", "type": "uint256" }
       ],
       "name": "getResult",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
+      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "address", "name": "_address", "type": "address" }
       ],
+      "name": "isAdmin",
+      "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
       "stateMutability": "view",
       "type": "function"
     },
     {
       "inputs": [],
       "name": "owner",
-      "outputs": [
-        {
-          "internalType": "address",
-          "name": "",
-          "type": "address"
-        }
-      ],
+      "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
       "stateMutability": "view",
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
-        }
-      ],
+      "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "name": "poolIds",
+      "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
       "name": "pools",
       "outputs": [
-        {
-          "internalType": "string",
-          "name": "title",
-          "type": "string"
-        },
-        {
-          "internalType": "uint256",
-          "name": "total",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "count",
-          "type": "uint256"
-        }
+        { "internalType": "string", "name": "title", "type": "string" },
+        { "internalType": "uint256", "name": "total", "type": "uint256" },
+        { "internalType": "uint256", "name": "count", "type": "uint256" }
       ],
       "stateMutability": "view",
       "type": "function"
     },
     {
       "inputs": [
-        {
-          "internalType": "bytes32",
-          "name": "requestId",
-          "type": "bytes32"
-        },
-        {
-          "internalType": "uint256",
-          "name": "randomness",
-          "type": "uint256"
-        }
+        { "internalType": "bytes32", "name": "requestId", "type": "bytes32" },
+        { "internalType": "uint256", "name": "randomness", "type": "uint256" }
       ],
       "name": "rawFulfillRandomness",
       "outputs": [],
@@ -290,11 +220,7 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "address",
-          "name": "_admin",
-          "type": "address"
-        }
+        { "internalType": "address", "name": "_admin", "type": "address" }
       ],
       "name": "removeAdmin",
       "outputs": [],
@@ -310,35 +236,19 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_poolId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "uint256",
-          "name": "_id",
-          "type": "uint256"
-        }
+        { "internalType": "uint256", "name": "_poolId", "type": "uint256" },
+        { "internalType": "uint256", "name": "_id", "type": "uint256" }
       ],
       "name": "requestRandomNumber",
       "outputs": [
-        {
-          "internalType": "bytes32",
-          "name": "requestId",
-          "type": "bytes32"
-        }
+        { "internalType": "bytes32", "name": "requestId", "type": "bytes32" }
       ],
       "stateMutability": "nonpayable",
       "type": "function"
     },
     {
       "inputs": [
-        {
-          "internalType": "address",
-          "name": "_admin",
-          "type": "address"
-        }
+        { "internalType": "address", "name": "_admin", "type": "address" }
       ],
       "name": "setAdmin",
       "outputs": [],
@@ -347,11 +257,7 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_fee",
-          "type": "uint256"
-        }
+        { "internalType": "uint256", "name": "_fee", "type": "uint256" }
       ],
       "name": "setFee",
       "outputs": [],
@@ -360,11 +266,7 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "address",
-          "name": "newOwner",
-          "type": "address"
-        }
+        { "internalType": "address", "name": "newOwner", "type": "address" }
       ],
       "name": "transferOwnership",
       "outputs": [],
@@ -373,19 +275,12 @@
     },
     {
       "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_poolId",
-          "type": "uint256"
-        },
-        {
-          "internalType": "string",
-          "name": "_title",
-          "type": "string"
-        },
+        { "internalType": "uint256", "name": "_poolId", "type": "uint256" },
+        { "internalType": "string", "name": "_title", "type": "string" },
+        { "internalType": "uint256[]", "name": "_rarity", "type": "uint256[]" },
         {
           "internalType": "uint256[]",
-          "name": "_rarity",
+          "name": "_rarityIds",
           "type": "uint256[]"
         }
       ],
@@ -431,7 +326,37 @@
           "type": "event"
         }
       },
-      "address": "0x7a789f5620408a44219e63a5b037f12a5f36196b"
+      "address": "0x51d51dcb6a2d150dbaf7e469ff5695e8157c39df"
+    },
+    "137": {
+      "events": {
+        "0x0e3481671e003b6034626dacb1d41d4f2ba7c0b610c55de9685c51b685153ae5": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "poolId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "itemId",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "result",
+              "type": "uint256"
+            }
+          ],
+          "name": "DiceLanded",
+          "type": "event"
+        }
+      },
+      "address": "0x51d51dcb6a2d150dbaf7e469ff5695e8157c39df"
     }
   }
 }

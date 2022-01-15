@@ -163,38 +163,4 @@ export class S3Service implements S3Interface {
   public getContentBucketName() {
     return this.configService.get('s3.contentsBucket');
   }
-
-  public generateFileKey(key: string): string {
-    const env = process.env.NODE_ENV;
-    return `${env === 'development' ? 'dev' : 'prod'}/${key}`;
-  }
-
-  public generateImageUrl(poolId: number, rarity: number): string {
-    //https://nft-meta.rada.network/testnet/imgs/[poolid]/[rarity].jpg
-
-    const env = process.env.NODE_ENV;
-    const baseUrl = 'https://nft-meta.rada.network';
-    return `${baseUrl}/${
-      env === 'development' ? 'testnet' : 'mainnet'
-    }/imgs/${poolId}/${rarity}.jpg`;
-  }
-
-  public getRarityName(rarity: number): string {
-    const nameJson = {
-      '1': 'Creator',
-      '2': 'Ruler',
-      '3': 'Caregiver',
-      '4': 'Jester',
-      '5': 'Citizen',
-      '6': 'Lover',
-      '7': 'Hero',
-      '8': 'Magician',
-      '9': 'Rebel',
-      '10': 'Explorer',
-      '11': 'Sage',
-      '12': 'Innocent',
-    };
-
-    return nameJson[rarity.toString()];
-  }
 }

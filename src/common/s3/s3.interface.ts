@@ -19,10 +19,4 @@ export interface S3Interface {
   listFiles(bucket: string, keyPrefix: string): Promise<string[]>;
 
   getContentBucketName(): string;
-
-  generateFileKey(key: string): string;
-
-  generateImageUrl(poolId: number, rarity: number): string;
-
-  getRarityName(rarity: number): string;
 }

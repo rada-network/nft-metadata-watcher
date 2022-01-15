@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, QueryRunner, Repository } from 'typeorm';
 import { OpenBox } from './open_box.model';
@@ -6,6 +7,7 @@ import { OpenBox } from './open_box.model';
 @Injectable()
 export class OpenBoxService {
   constructor(
+    private readonly configService: ConfigService,
     @InjectRepository(OpenBox)
     private readonly openBoxRepository: Repository<OpenBox>,
   ) {}
@@ -66,5 +68,43 @@ export class OpenBoxService {
     await queryRunner.manager.save(record, { reload });
 
     return record;
+  }
+
+  public generateFileKey(key: string): string {
+    const env = this.configService.get('env');
+    return `${env === 'development' ? 'dev' : 'prod'}/${key}`;
+  }
+
+  /**
+   * Format: https://nft-meta.rada.network/testnet/imgs/[poolid]/[rarity].jpg
+   * @param poolId
+   * @param rarity
+   * @returns
+   */
+  getRarityImageUrl(poolId: number, rarity: number): string {
+    const env = this.configService.get('env');
+    const baseUrl = this.configService.get('nftMetadata.rarityBaseUrl');
+    return `${baseUrl}/${
+      env === 'development' ? 'testnet' : 'mainnet'
+    }/imgs/${poolId}/${rarity}.jpg`;
+  }
+
+  getRarityName(rarity: number): string {
+    const nameJson = {
+      '1': 'Creator',
+      '2': 'Ruler',
+      '3': 'Caregiver',
+      '4': 'Jester',
+      '5': 'Citizen',
+      '6': 'Lover',
+      '7': 'Hero',
+      '8': 'Magician',
+      '9': 'Rebel',
+      '10': 'Explorer',
+      '11': 'Sage',
+      '12': 'Innocent',
+    };
+
+    return nameJson[rarity.toString()];
   }
 }

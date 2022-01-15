@@ -1,4 +1,5 @@
 export default () => ({
+  env: process.env.NODE_ENV,
   ethereum_accounts: {
     path: process.env.ETHEREUM_ACCOUNTS_PATH,
   },
@@ -36,5 +37,8 @@ export default () => ({
     forcePathStyle: process.env.S3_FORCE_PATH_STYLE,
     accountKey: process.env.S3_ACCOUNT_KEY,
     accountSecret: process.env.S3_ACCOUNT_SECRET,
+  },
+  nftMetadata: {
+    rarityBaseUrl: process.env.NFT_METADATA_RARITY_BASE_URL,
   },
 });
