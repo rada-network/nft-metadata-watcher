@@ -1,37 +1,34 @@
-import { LoggerService } from '@nestjs/common';
+import { ConsoleLogger } from '@nestjs/common';
+import { BotInterface } from 'src/common/bot/bot.interface';
 
-export class MonoLogger implements LoggerService {
-  log(message: string) {
-    console.log('[INFO]', new Date().toISOString(), message);
+export class MonoLogger extends ConsoleLogger {
+  private botService: BotInterface;
+
+  setBotService(botService: BotInterface) {
+    this.botService = botService;
   }
-  error(message: string, trace: string) {
-    console.log('[ERROR]', new Date().toISOString(), message, trace);
-  }
-  warn(message: string) {
-    console.log('[WARN]', new Date().toISOString(), message);
-  }
-  debug(message: string) {
-    return;
-  }
-  verbose(message: string) {
-    return;
+
+  error(message: any, stack?: string, context?: string) {
+    if (this.botService) {
+      this.botService.sendMessageNoThrow(message);
+    }
+    // eslint-disable-next-line prefer-rest-params
+    super.error.apply(this, arguments);
   }
 }
 
-export class DebugMonoLogger implements LoggerService {
-  log(message: string) {
-    console.log('[INFO]', new Date().toISOString(), message);
+export class DebugMonoLogger extends ConsoleLogger {
+  private botService: BotInterface;
+
+  setBotService(botService: BotInterface) {
+    this.botService = botService;
   }
-  error(message: string, trace: string) {
-    console.log('[ERROR]', new Date().toISOString(), message, trace);
-  }
-  warn(message: string) {
-    console.log('[WARN]', new Date().toISOString(), message);
-  }
-  debug(message: string) {
-    console.log('[DEBUG]', new Date().toISOString(), message);
-  }
-  verbose(message: string) {
-    console.log('[VERBOSE]', new Date().toISOString(), message);
+
+  error(message: any, stack?: string, context?: string) {
+    if (this.botService) {
+      this.botService.sendMessageNoThrow(message);
+    }
+    // eslint-disable-next-line prefer-rest-params
+    super.error.apply(this, arguments);
   }
 }

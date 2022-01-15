@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TelegramBotService } from 'src/common/bot/telegram_bot.service';
 import { EthereumAccountsService } from 'src/common/ethereum_accounts/ethereum_accounts.service';
 import { TransactionService } from 'src/common/transaction/transaction.service';
 import { BscWeb3Service } from 'src/common/web3/bsc_web3.service';
@@ -25,7 +24,6 @@ import { BscLogsWatcherService } from './bsc_logs_watcher.service';
       useClass: EthereumAccountsService,
     },
     { provide: 'TransactionInterface', useClass: TransactionService },
-    { provide: 'BotInterface', useClass: TelegramBotService },
   ],
 })
 export class BscLogsWatcherModule {}
