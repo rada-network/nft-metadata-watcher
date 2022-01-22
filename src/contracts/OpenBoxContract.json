@@ -151,15 +151,25 @@
       "inputs": [
         { "internalType": "uint16", "name": "_poolId", "type": "uint16" },
         { "internalType": "address", "name": "_nftAddress", "type": "address" },
+        { "internalType": "uint32", "name": "_startId", "type": "uint32" },
+        { "internalType": "uint32", "name": "_endId", "type": "uint32" },
         {
           "internalType": "address",
           "name": "_tokenAddress",
           "type": "address"
-        }
+        },
+        { "internalType": "uint256", "name": "_startTime", "type": "uint256" }
       ],
-      "name": "addPool",
+      "name": "addOrUpdatePool",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "address", "name": "", "type": "address" }],
+      "name": "admins",
+      "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+      "stateMutability": "view",
       "type": "function"
     },
     {
@@ -187,7 +197,8 @@
               "internalType": "uint256",
               "name": "startTime",
               "type": "uint256"
-            }
+            },
+            { "internalType": "bool", "name": "isPublic", "type": "bool" }
           ],
           "internalType": "struct NFTManContract.POOL_INFO",
           "name": "",
@@ -204,6 +215,16 @@
         { "internalType": "uint16[]", "name": "", "type": "uint16[]" }
       ],
       "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        { "internalType": "uint16", "name": "_poolId", "type": "uint16" },
+        { "internalType": "bool", "name": "_isPublic", "type": "bool" }
+      ],
+      "name": "handlePublicPool",
+      "outputs": [],
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
@@ -247,6 +268,32 @@
       "type": "function"
     },
     {
+      "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+      "name": "poolIds",
+      "outputs": [{ "internalType": "uint16", "name": "", "type": "uint16" }],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [{ "internalType": "uint16", "name": "", "type": "uint16" }],
+      "name": "pools",
+      "outputs": [
+        { "internalType": "address", "name": "nftAddress", "type": "address" },
+        { "internalType": "uint256", "name": "startId", "type": "uint256" },
+        { "internalType": "uint256", "name": "endId", "type": "uint256" },
+        { "internalType": "uint32", "name": "totalOpen", "type": "uint32" },
+        {
+          "internalType": "address",
+          "name": "tokenAddress",
+          "type": "address"
+        },
+        { "internalType": "uint256", "name": "startTime", "type": "uint256" },
+        { "internalType": "bool", "name": "isPublic", "type": "bool" }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "renounceOwnership",
       "outputs": [],
@@ -286,24 +333,6 @@
         { "internalType": "uint16", "name": "_typeRarity", "type": "uint16" }
       ],
       "name": "updateNFT",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        { "internalType": "uint16", "name": "_poolId", "type": "uint16" },
-        { "internalType": "address", "name": "_nftAddress", "type": "address" },
-        { "internalType": "uint32", "name": "_startId", "type": "uint32" },
-        { "internalType": "uint32", "name": "_endId", "type": "uint32" },
-        {
-          "internalType": "address",
-          "name": "_tokenAddress",
-          "type": "address"
-        },
-        { "internalType": "uint256", "name": "_startTime", "type": "uint256" }
-      ],
-      "name": "updatePool",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -410,6 +439,62 @@
         }
       },
       "address": "0xf843f196B91287Ba594E6a06aEd89494C0C4aEAf"
+    },
+    "80001": {
+      "events": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "buyerAddress",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "uint16",
+            "name": "poolId",
+            "type": "uint16"
+          },
+          {
+            "indexed": true,
+            "internalType": "uint256",
+            "name": "newTokenId",
+            "type": "uint256"
+          }
+        ],
+        "name": "OpenBox",
+        "type": "event"
+      },
+      "address": "0x77f866b1E2528544C8CBfda8D58001dd1abcE70e"
+    },
+    "137": {
+      "events": {
+        "anonymous": false,
+        "inputs": [
+          {
+            "indexed": false,
+            "internalType": "address",
+            "name": "buyerAddress",
+            "type": "address"
+          },
+          {
+            "indexed": true,
+            "internalType": "uint16",
+            "name": "poolId",
+            "type": "uint16"
+          },
+          {
+            "indexed": true,
+            "internalType": "uint256",
+            "name": "newTokenId",
+            "type": "uint256"
+          }
+        ],
+        "name": "OpenBox",
+        "type": "event"
+      },
+      "address": "0x77f866b1E2528544C8CBfda8D58001dd1abcE70e"
     }
   }
 }
