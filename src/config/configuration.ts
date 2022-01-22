@@ -21,6 +21,11 @@ export default () => ({
     delayConfirmedBlocks: process.env.BSC_DELAY_CONFIRMED_BLOCKS,
     sleepTime: process.env.BSC_SLEEP_TIME,
   },
+  contract: {
+    openBoxContractAddress: process.env.OPEN_BOX_CONTRACT_ADDRESS,
+    randomizeByRarityContractAddress:
+      process.env.RANDOMIZE_BY_RARITY_CONTRACT_ADDRESS,
+  },
   redis: {
     host: process.env.REDIS_HOST,
     port: process.env.REDIS_PORT,

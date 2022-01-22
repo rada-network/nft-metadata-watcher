@@ -92,18 +92,18 @@ export class OpenBoxService {
 
   getRarityName(rarity: number): string {
     const nameJson = {
-      '1': 'Creator',
-      '2': 'Ruler',
-      '3': 'Caregiver',
+      '1': 'Citizen',
+      '2': 'Innocence',
+      '3': 'Explorer',
       '4': 'Jester',
-      '5': 'Citizen',
+      '5': 'Caregiver',
       '6': 'Lover',
-      '7': 'Hero',
-      '8': 'Magician',
+      '7': 'Ruler',
+      '8': 'Hero',
       '9': 'Rebel',
-      '10': 'Explorer',
-      '11': 'Sage',
-      '12': 'Innocent',
+      '10': 'Creator',
+      '11': 'Magician',
+      '12': 'Sage',
     };
 
     return nameJson[rarity.toString()];
