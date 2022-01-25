@@ -6,7 +6,7 @@ let contractAddress: string | null = null;
 
 console.log('Contract Address: ', contractAddress);
 // TODO: optimize gas
-export const REQUEST_RANDOM_NUMBER_GAS_LIMIT = '210000';
+export const REQUEST_RANDOM_NUMBER_GAS_LIMIT = '400000';
 
 export const getDiceLandedEventTopics = (networkId: string) => {
   const { events } = networks[networkId];

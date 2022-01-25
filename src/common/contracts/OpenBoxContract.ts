@@ -5,7 +5,7 @@ import { abi, networks } from '../../contracts/OpenBoxContract.json';
 let contractAddress: string | null = null;
 
 // TODO: optimize gas
-export const UPDATE_NFT_NUMBER_GAS_LIMIT = '210000';
+export const UPDATE_NFT_NUMBER_GAS_LIMIT = '400000';
 
 export const getOpenBoxEventTopics = (networkId: string) => {
   const { events } = networks[networkId];
