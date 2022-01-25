@@ -1,5 +1,7 @@
 export default () => ({
-  env: process.env.NODE_ENV,
+  env: {
+    nodeEnv: process.env.NODE_ENV,
+  },
   ethereum_accounts: {
     path: process.env.ETHEREUM_ACCOUNTS_PATH,
     address: process.env.ETHEREUM_ACCOUNTS_ADDRESS,

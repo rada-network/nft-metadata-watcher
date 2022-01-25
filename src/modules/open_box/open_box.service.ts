@@ -73,8 +73,8 @@ export class OpenBoxService {
 
   public generateFileKey(key: string): string {
     console.log('generateFileKey');
-    console.log(this.configService.get('env'));
-    const env = this.configService.get('env');
+    console.log(this.configService.get('env.nodeEnv'));
+    const env = this.configService.get('env.nodeEnv');
     console.log(env);
     console.log(env === Environment.production);
     return `${env === Environment.production ? 'prod' : 'dev'}/${key}`;
@@ -87,7 +87,7 @@ export class OpenBoxService {
    * @returns
    */
   getRarityImageUrl(poolId: number, rarity: number): string {
-    const env = this.configService.get('env');
+    const env = this.configService.get('env.nodeEnv');
     const baseUrl = this.configService.get('nftMetadata.rarityBaseUrl');
     return `${baseUrl}/${
       env === Environment.production ? 'mainnet' : 'testnet'
