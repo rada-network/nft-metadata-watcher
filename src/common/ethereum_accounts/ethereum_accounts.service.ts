@@ -32,34 +32,13 @@ export class EthereumAccountsService {
   }
 
   getPrivateKey(role: EthereumAccountRole): Buffer {
-    const accountPrivateKey = this.accounts[role]?.privateKey;
-    if (accountPrivateKey) {
-      return accountPrivateKey;
-    }
-    // TODO: encrypt/secure privateKey
-    const privateKeyBuffer = readFileSync(
-      `${this.configService.get('ethereum_accounts.path')}/${role}/privateKey`,
+    return toBufferFromString(
+      `0x${this.configService.get('ethereum_accounts.privateKey')}`,
     );
-
-    this.accounts[role].privateKey = toBufferFromString(
-      `0x${privateKeyBuffer.toString('utf-8')}`,
-    );
-
-    return this.accounts[role].privateKey;
   }
 
   getAddress(role: EthereumAccountRole): string {
-    const accountAddress = this.accounts[role]?.address;
-    if (accountAddress) {
-      return accountAddress;
-    }
-
-    const addressBuffer = readFileSync(
-      `${this.configService.get('ethereum_accounts.path')}/${role}/address`,
-    );
-
-    this.accounts[role].address = addressBuffer.toString('utf-8');
-    return this.accounts[role].address;
+    return this.configService.get('ethereum_accounts.address');
   }
 
   getNonce(role: EthereumAccountRole): number {
