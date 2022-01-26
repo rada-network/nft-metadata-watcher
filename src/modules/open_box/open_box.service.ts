@@ -72,11 +72,7 @@ export class OpenBoxService {
   }
 
   public generateFileKey(key: string): string {
-    console.log('generateFileKey');
-    console.log(this.configService.get('env.nodeEnv'));
     const env = this.configService.get('env.nodeEnv');
-    console.log(env);
-    console.log(env === Environment.production);
     return `${env === Environment.production ? 'prod' : 'dev'}/${key}`;
   }
 

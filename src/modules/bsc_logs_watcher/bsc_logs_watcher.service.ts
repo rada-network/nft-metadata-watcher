@@ -18,7 +18,6 @@ import {
 import {
   getRandomizeByRarityContractAddress,
   requestRandomNumber,
-  REQUEST_RANDOM_NUMBER_GAS_LIMIT,
 } from 'src/common/contracts/RandomizeByRarityContract';
 import BigNumber from 'bignumber.js';
 import { TransactionInterface } from 'src/common/transaction/transaction.interface';
@@ -194,7 +193,9 @@ export class BscLogsWatcherService {
               EthereumAccountRole.signer,
             ),
             to: getRandomizeByRarityContractAddress(polygonNetworkId),
-            gasLimit: REQUEST_RANDOM_NUMBER_GAS_LIMIT,
+            gasLimit: this.configService.get(
+              'contract.randomizeByRarityContractGasLimit',
+            ),
             gasPrice,
             value: new BigNumber(0),
             data: requestRandomNumber(polygonNetworkId, poolId, tokenId),

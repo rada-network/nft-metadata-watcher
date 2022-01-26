@@ -4,9 +4,6 @@ import { abi, networks } from '../../contracts/RandomizeByRarityContract.json';
 
 let contractAddress: string | null = null;
 
-// TODO: optimize gas
-export const REQUEST_RANDOM_NUMBER_GAS_LIMIT = '400000';
-
 export const getDiceLandedEventTopics = (networkId: string) => {
   const { events } = networks[networkId];
   return Object.keys(events).filter((key) => events[key].name === 'DiceLanded');

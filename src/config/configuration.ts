@@ -27,8 +27,11 @@ export default () => ({
   },
   contract: {
     openBoxContractAddress: process.env.OPEN_BOX_CONTRACT_ADDRESS,
+    openBoxContractGasLimit: process.env.OPEN_BOX_CONTRACT_GAS_LIMIT,
     randomizeByRarityContractAddress:
       process.env.RANDOMIZE_BY_RARITY_CONTRACT_ADDRESS,
+    randomizeByRarityContractGasLimit:
+      process.env.RANDOMIZE_BY_RARITY_CONTRACT_GAS_LIMIT,
   },
   redis: {
     host: process.env.REDIS_HOST,

@@ -14,7 +14,6 @@ import BigNumber from 'bignumber.js';
 import {
   getOpenBoxContractAddress,
   updateNFT,
-  UPDATE_NFT_NUMBER_GAS_LIMIT,
 } from 'src/common/contracts/OpenBoxContract';
 import {
   EthereumAccountRole,
@@ -215,7 +214,9 @@ export class PolygonLogsWatcherService {
               EthereumAccountRole.signer,
             ),
             to: getOpenBoxContractAddress(bscNetworkId),
-            gasLimit: UPDATE_NFT_NUMBER_GAS_LIMIT,
+            gasLimit: this.configService.get(
+              'contract.openBoxContractGasLimit',
+            ),
             gasPrice,
             value: new BigNumber(0),
             data: updateNFT(bscNetworkId, poolId, tokenId, rarity),
