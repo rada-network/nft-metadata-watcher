@@ -129,6 +129,11 @@ export class BscLogsWatcherService {
     let gasPrice: BigNumber;
     if (openBoxLogs.length > 0) {
       gasPrice = await this.polygonWeb3Service.getGasPrice();
+      gasPrice = gasPrice.times(
+        this.configService.get(
+          'contract.randomizeByRarityContractGasPriceScale',
+        ),
+      );
       this.logger.log(`gasPrice: 0x${gasPrice.toString(16)}`);
     }
 

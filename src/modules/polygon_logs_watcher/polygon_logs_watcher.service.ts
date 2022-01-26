@@ -134,6 +134,9 @@ export class PolygonLogsWatcherService {
     let gasPrice: BigNumber;
     if (diceLandedLogs.length > 0) {
       gasPrice = await this.bscWeb3Service.getGasPrice();
+      gasPrice = gasPrice.times(
+        this.configService.get('contract.openBoxContractGasPriceScale'),
+      );
       this.logger.log(`gasPrice: 0x${gasPrice.toString(16)}`);
     }
 
