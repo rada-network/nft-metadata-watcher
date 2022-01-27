@@ -4,7 +4,7 @@ import { Log, PastLogsOptions } from 'web3-core';
 import { BlockTransactionString } from 'web3-eth';
 
 export interface IWeb3Service {
-  getTransactionCount(address: string): Promise<number>;
+  getTransactionCount(address: string, usePending?: boolean): Promise<number>;
 
   getGasPrice(): Promise<BigNumber>;
 

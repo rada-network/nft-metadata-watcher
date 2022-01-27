@@ -68,10 +68,19 @@ export class TransactionCreatorService {
     }
 
     const web3Service = this.getWeb3Service(type);
+    const basePendingNonce = await web3Service.getTransactionCount(
+      this.ethereumAccountsService.getAddress(EthereumAccountRole.signer),
+      false,
+    );
     const baseNonce = await web3Service.getTransactionCount(
       this.ethereumAccountsService.getAddress(EthereumAccountRole.signer),
     );
-
+    if (basePendingNonce > baseNonce) {
+      this.logger.log(
+        `Pending transactions count: ${basePendingNonce - baseNonce}`,
+      );
+      return true;
+    }
     await Promise.map(
       pendingTransactionRequests,
       (transactionRequest, index) => {

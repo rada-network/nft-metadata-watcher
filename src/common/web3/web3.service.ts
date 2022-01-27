@@ -21,8 +21,11 @@ export abstract class Web3Service implements IWeb3Service {
 
   protected useEip1559?: boolean;
 
-  getTransactionCount(address: string): Promise<number> {
-    return this.web3.eth.getTransactionCount(address, 'pending');
+  getTransactionCount(address: string, usePending = false): Promise<number> {
+    if (usePending) {
+      return this.web3.eth.getTransactionCount(address, 'pending');
+    }
+    return this.web3.eth.getTransactionCount(address);
   }
 
   decodeParameters(inputs: any, data: any): any {
