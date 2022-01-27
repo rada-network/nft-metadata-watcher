@@ -68,7 +68,7 @@ export abstract class Web3Service implements IWeb3Service {
       eip1559TxData.maxPriorityFeePerGas = txData.gasPrice;
       eip1559TxData.type = '0x02';
       delete eip1559TxData.gasPrice;
-
+      console.log('eip1559TxDataaaaaaaaaaaaaaaaaaaa: ', eip1559TxData);
       tx = FeeMarketEIP1559Transaction.fromTxData(eip1559TxData, {
         common: this.common,
       });
