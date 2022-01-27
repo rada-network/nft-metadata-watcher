@@ -63,7 +63,7 @@ export abstract class Web3Service implements IWeb3Service {
   sign(txData: TxData, privateKey: Buffer): string {
     let tx: Transaction | FeeMarketEIP1559Transaction;
     if (this.useEip1559) {
-      const eip1559TxData = txData as FeeMarketEIP1559TxData;
+      const eip1559TxData = { ...txData } as FeeMarketEIP1559TxData;
       eip1559TxData.maxFeePerGas = txData.gasPrice;
       eip1559TxData.maxPriorityFeePerGas = txData.gasPrice;
       eip1559TxData.type = '0x02';
