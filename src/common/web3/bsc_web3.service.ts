@@ -27,5 +27,9 @@ export class BscWeb3Service extends Web3Service {
         chainId,
       });
     }
+
+    if (this.configService.get('bsc.useEip1559') === 'true') {
+      this.useEip1559 = true;
+    }
   }
 }

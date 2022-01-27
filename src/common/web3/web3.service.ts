@@ -1,5 +1,10 @@
 import Common from '@ethereumjs/common';
-import { Transaction, TxData } from '@ethereumjs/tx';
+import {
+  Transaction,
+  TxData,
+  FeeMarketEIP1559Transaction,
+  FeeMarketEIP1559TxData,
+} from '@ethereumjs/tx';
 import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 import BigNumber from 'bignumber.js';
@@ -13,6 +18,8 @@ export abstract class Web3Service implements IWeb3Service {
   web3: Web3;
   common: Common;
   protected readonly logger = new Logger(Web3Service.name);
+
+  protected useEip1559?: boolean;
 
   getTransactionCount(address: string): Promise<number> {
     return this.web3.eth.getTransactionCount(address, 'pending');
@@ -54,9 +61,23 @@ export abstract class Web3Service implements IWeb3Service {
   }
 
   sign(txData: TxData, privateKey: Buffer): string {
-    const tx = Transaction.fromTxData(txData, {
-      common: this.common,
-    });
+    let tx: Transaction | FeeMarketEIP1559Transaction;
+    if (this.useEip1559) {
+      const eip1559TxData = txData as FeeMarketEIP1559TxData;
+      eip1559TxData.maxFeePerGas = txData.gasPrice;
+      eip1559TxData.maxPriorityFeePerGas = txData.gasPrice;
+      eip1559TxData.type = '0x02';
+      delete eip1559TxData.gasPrice;
+
+      tx = FeeMarketEIP1559Transaction.fromTxData(eip1559TxData, {
+        common: this.common,
+      });
+    } else {
+      tx = Transaction.fromTxData(txData, {
+        common: this.common,
+      });
+    }
+
     const signedTx = tx.sign(privateKey);
     return `0x${signedTx.serialize().toString('hex')}`;
   }

@@ -15,6 +15,7 @@ export default () => ({
     scanFromBackLatestBlock: process.env.POLYGON_SCAN_FROM_BACK_LATEST_BLOCK,
     delayConfirmedBlocks: process.env.POLYGON_DELAY_CONFIRMED_BLOCKS,
     sleepTime: process.env.POLYGON_SLEEP_TIME,
+    useEip1559: process.env.POLYGON_USE_EIP_1559,
   },
   bsc: {
     url: process.env.BSC_URL,
@@ -24,6 +25,7 @@ export default () => ({
     scanFromBackLatestBlock: process.env.BSC_SCAN_FROM_BACK_LATEST_BLOCK,
     delayConfirmedBlocks: process.env.BSC_DELAY_CONFIRMED_BLOCKS,
     sleepTime: process.env.BSC_SLEEP_TIME,
+    useEip1559: process.env.BSC_USE_EIP_1559,
   },
   contract: {
     openBoxContractAddress: process.env.OPEN_BOX_CONTRACT_ADDRESS,

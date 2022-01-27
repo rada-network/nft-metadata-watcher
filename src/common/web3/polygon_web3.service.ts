@@ -27,5 +27,9 @@ export class PolygonWeb3Service extends Web3Service {
         chainId,
       });
     }
+
+    if (this.configService.get('polygon.useEip1559') === 'true') {
+      this.useEip1559 = true;
+    }
   }
 }
