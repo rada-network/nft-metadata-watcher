@@ -18,17 +18,29 @@ export class BscWeb3Service extends Web3Service {
 
     const networkId = parseInt(configService.get('bsc.networkId'), 10);
     const chainId = parseInt(configService.get('bsc.chainId'), 10);
+    const isUseEip1559 = this.configService.get('bsc.useEip1559') === 'true';
     if (chainId === 1) {
       this.common = new Common({ chain: 1 });
     } else {
-      this.common = Common.forCustomChain('mainnet', {
-        name: 'private',
-        networkId,
-        chainId,
-      });
+      if (isUseEip1559) {
+        this.common = Common.custom(
+          {
+            name: 'private',
+            networkId,
+            chainId,
+          },
+          { hardfork: 'london' },
+        );
+      } else {
+        this.common = Common.custom({
+          name: 'private',
+          networkId,
+          chainId,
+        });
+      }
     }
 
-    if (this.configService.get('bsc.useEip1559') === 'true') {
+    if (isUseEip1559) {
       this.useEip1559 = true;
     }
   }
