@@ -9,7 +9,7 @@ import {
 import { BscTransactionRequest } from './bsc_transaction_request.model';
 import { PolygonTransactionRequest } from './polygon_transaction_request.model';
 
-const GET_PENDING_REQUESTS_LIMIT = 100;
+const GET_PENDING_REQUESTS_LIMIT = 20;
 
 export enum TransactionRequestType {
   bsc = 'bscTransactionRequest',

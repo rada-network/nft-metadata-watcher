@@ -70,12 +70,16 @@ export class TransactionCreatorService {
     const web3Service = this.getWeb3Service(type);
     const basePendingNonce = await web3Service.getTransactionCount(
       this.ethereumAccountsService.getAddress(EthereumAccountRole.signer),
-      false,
+      true,
     );
     const baseNonce = await web3Service.getTransactionCount(
       this.ethereumAccountsService.getAddress(EthereumAccountRole.signer),
     );
-    if (basePendingNonce > baseNonce) {
+
+    this.logger.log(`Base Pending nonce: ${basePendingNonce}`);
+    this.logger.log(`Base nonce: ${baseNonce}`);
+
+    if (basePendingNonce - baseNonce > 5) {
       this.logger.log(
         `Pending transactions count: ${basePendingNonce - baseNonce}`,
       );
@@ -87,11 +91,11 @@ export class TransactionCreatorService {
         return {
           type,
           transactionRequest,
-          nonce: baseNonce + index,
+          nonce: basePendingNonce + index,
           web3Service,
         };
       },
-    ).map(this.handleSingleTransactionRequest.bind(this), { concurrency: 3 });
+    ).map(this.handleSingleTransactionRequest.bind(this), { concurrency: 1 });
 
     return true;
   }
@@ -143,7 +147,7 @@ export class TransactionCreatorService {
       lockedRequest.hash = hash;
       this.logger.log(
         `${type}: Request was confirmed on blockchain, listening error event 
-        - id=${lockedRequest.id},attempt=${lockedRequest.attempt},txHash=${hash}`,
+        - id=${lockedRequest.id},attempt=${lockedRequest.attempt}, nonce=${nonce} txHash=${hash}`,
       );
 
       await queryRunner.manager.save(lockedRequest, { reload: false });
