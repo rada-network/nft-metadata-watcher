@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, In, LessThan, QueryRunner, Repository } from 'typeorm';
 import {
@@ -9,8 +10,6 @@ import {
 import { BscTransactionRequest } from './bsc_transaction_request.model';
 import { PolygonTransactionRequest } from './polygon_transaction_request.model';
 
-const GET_PENDING_REQUESTS_LIMIT = 20;
-
 export enum TransactionRequestType {
   bsc = 'bscTransactionRequest',
   polygon = 'polygonTransactionRequest',
@@ -20,6 +19,8 @@ export enum TransactionRequestType {
 @Injectable()
 export class TransactionRequestService {
   constructor(
+    private readonly configService: ConfigService,
+
     @InjectRepository(BscTransactionRequest)
     private readonly bscTransactionRequest: Repository<BscTransactionRequest>,
     @InjectRepository(PolygonTransactionRequest)
@@ -100,7 +101,9 @@ export class TransactionRequestService {
         deletedAt: null,
       })
       .orderBy('request.updatedAt', 'ASC')
-      .take(GET_PENDING_REQUESTS_LIMIT)
+      .take(
+        this.configService.get('transactionCreator.getPendingRequestsLimit'),
+      )
       .getMany();
   }
 

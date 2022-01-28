@@ -34,4 +34,8 @@ export interface IWeb3Service {
     callObject: { to: string; data: string },
     defaultBlock: number | string,
   ): Promise<string>;
+
+  getAddress(): string;
+
+  getPrivateKey(): Buffer;
 }

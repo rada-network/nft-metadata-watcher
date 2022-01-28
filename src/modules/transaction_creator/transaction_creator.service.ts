@@ -1,10 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Promise } from 'bluebird';
-import {
-  EthereumAccountRole,
-  EthereumAccountsService,
-} from 'src/common/ethereum_accounts/ethereum_accounts.service';
 import { TransactionInterface } from 'src/common/transaction/transaction.interface';
 import { IWeb3Service } from 'src/common/web3/web3.service.interface';
 import {
@@ -26,8 +22,6 @@ export class TransactionCreatorService {
 
     @Inject('TransactionInterface')
     private readonly transaction: TransactionInterface,
-    @Inject('EthereumAccountsService')
-    private readonly ethereumAccountsService: EthereumAccountsService,
     @Inject('BscWeb3Service')
     private readonly bscWeb3Service: IWeb3Service,
     @Inject('PolygonWeb3Service')
@@ -69,17 +63,20 @@ export class TransactionCreatorService {
 
     const web3Service = this.getWeb3Service(type);
     const basePendingNonce = await web3Service.getTransactionCount(
-      this.ethereumAccountsService.getAddress(EthereumAccountRole.signer),
+      web3Service.getAddress(),
       true,
     );
     const baseNonce = await web3Service.getTransactionCount(
-      this.ethereumAccountsService.getAddress(EthereumAccountRole.signer),
+      web3Service.getAddress(),
     );
 
     this.logger.log(`Base Pending nonce: ${basePendingNonce}`);
     this.logger.log(`Base nonce: ${baseNonce}`);
 
-    if (basePendingNonce - baseNonce > 5) {
+    if (
+      basePendingNonce - baseNonce >
+      this.configService.get('transactionCreator.maxAllowedPendingTransactions')
+    ) {
       this.logger.log(
         `Pending transactions count: ${basePendingNonce - baseNonce}`,
       );
@@ -134,10 +131,7 @@ export class TransactionCreatorService {
       lockedRequest.attempt = lockedRequest.attempt + 1;
 
       const txData = lockedRequest.getTxData();
-      const signedTx = web3Service.sign(
-        txData,
-        this.ethereumAccountsService.getPrivateKey(EthereumAccountRole.signer),
-      );
+      const signedTx = web3Service.sign(txData, web3Service.getPrivateKey());
 
       // send tx
       const hash = await web3Service.send(signedTx, (err: Error) =>

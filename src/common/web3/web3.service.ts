@@ -133,4 +133,12 @@ export abstract class Web3Service implements IWeb3Service {
       return this.getPastLogs(params);
     }
   }
+
+  getAddress(): string {
+    throw new Error('This is abstract medthod.');
+  }
+
+  getPrivateKey(): Buffer {
+    throw new Error('This is abstract medthod.');
+  }
 }

@@ -8,10 +8,6 @@ import {
   toNumber,
 } from 'src/common/ethereum_util/ethereum.util';
 import {
-  EthereumAccountRole,
-  EthereumAccountsService,
-} from 'src/common/ethereum_accounts/ethereum_accounts.service';
-import {
   getOpenBoxContractAddress,
   getOpenBoxEventTopics,
 } from 'src/common/contracts/OpenBoxContract';
@@ -43,8 +39,6 @@ export class BscLogsWatcherService {
     private readonly bscWeb3Service: IWeb3Service,
     @Inject('PolygonWeb3Service')
     private readonly polygonWeb3Service: IWeb3Service,
-    @Inject('EthereumAccountsService')
-    private readonly ethereumAccountsService: EthereumAccountsService,
   ) {}
 
   private readonly logger = new Logger(BscLogsWatcherService.name);
@@ -192,9 +186,7 @@ export class BscLogsWatcherService {
           TransactionRequestType.polygon,
           queryRunner,
           {
-            from: this.ethereumAccountsService.getAddress(
-              EthereumAccountRole.signer,
-            ),
+            from: this.polygonWeb3Service.getAddress(),
             to: getRandomizeByRarityContractAddress(polygonNetworkId),
             gasLimit: this.configService.get('polygon.gasLimit'),
             gasPrice,

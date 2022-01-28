@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Web3 from 'web3';
+import { toBufferFromString } from '../ethereum_util/ethereum.util';
 import { Web3Service } from './web3.service';
 
 @Injectable()
@@ -43,5 +44,15 @@ export class BscWeb3Service extends Web3Service {
     if (isUseEip1559) {
       this.useEip1559 = true;
     }
+  }
+
+  getAddress(): string {
+    return this.configService.get('bsc.accountAddress');
+  }
+
+  getPrivateKey(): Buffer {
+    return toBufferFromString(
+      `0x${this.configService.get('bsc.accountPrivateKey')}`,
+    );
   }
 }

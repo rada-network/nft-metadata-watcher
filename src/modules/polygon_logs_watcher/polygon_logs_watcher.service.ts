@@ -15,10 +15,6 @@ import {
   getOpenBoxContractAddress,
   updateNFT,
 } from 'src/common/contracts/OpenBoxContract';
-import {
-  EthereumAccountRole,
-  EthereumAccountsService,
-} from 'src/common/ethereum_accounts/ethereum_accounts.service';
 import { OpenBoxService } from '../open_box/open_box.service';
 import {
   TransactionRequestService,
@@ -44,8 +40,6 @@ export class PolygonLogsWatcherService {
     private readonly polygonWeb3Service: IWeb3Service,
     @Inject('BscWeb3Service')
     private readonly bscWeb3Service: IWeb3Service,
-    @Inject('EthereumAccountsService')
-    private readonly ethereumAccountsService: EthereumAccountsService,
     @Inject('S3Interface')
     private readonly s3Service: S3Service,
   ) {}
@@ -211,9 +205,7 @@ export class PolygonLogsWatcherService {
           TransactionRequestType.bsc,
           queryRunner,
           {
-            from: this.ethereumAccountsService.getAddress(
-              EthereumAccountRole.signer,
-            ),
+            from: this.bscWeb3Service.getAddress(),
             to: getOpenBoxContractAddress(bscNetworkId),
             gasLimit: this.configService.get('bsc.gasLimit'),
             gasPrice,

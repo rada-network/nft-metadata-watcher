@@ -2,11 +2,6 @@ export default () => ({
   env: {
     nodeEnv: process.env.NODE_ENV,
   },
-  ethereum_accounts: {
-    path: process.env.ETHEREUM_ACCOUNTS_PATH,
-    address: process.env.ETHEREUM_ACCOUNTS_ADDRESS,
-    privateKey: process.env.ETHEREUM_ACCOUNTS_PRIVATE_KEY,
-  },
   polygon: {
     url: process.env.POLYGON_URL,
     networkId: process.env.POLYGON_NETWORK_ID,
@@ -18,6 +13,8 @@ export default () => ({
     useEip1559: process.env.POLYGON_USE_EIP_1559,
     gasLimit: process.env.POLYGON_GAS_LIMIT,
     gasPriceScale: process.env.POLYGON_GAS_PRICE_SCALE,
+    accountAddress: process.env.POLYGON_ACCOUNT_ADDRESS,
+    accountPrivateKey: process.env.POLYGON_ACCOUNT_PRIVATE_KEY,
   },
   bsc: {
     url: process.env.BSC_URL,
@@ -30,6 +27,8 @@ export default () => ({
     useEip1559: process.env.BSC_USE_EIP_1559,
     gasLimit: process.env.BSC_GAS_LIMIT,
     gasPriceScale: process.env.BSC_GAS_PRICE_SCALE,
+    accountAddress: process.env.BSC_ACCOUNT_ADDRESS,
+    accountPrivateKey: process.env.BSC_ACCOUNT_PRIVATE_KEY,
   },
   contract: {
     openBoxContractAddress: process.env.OPEN_BOX_CONTRACT_ADDRESS,
@@ -42,6 +41,10 @@ export default () => ({
   },
   transactionCreator: {
     sleepTime: process.env.TRANSACTION_CREATOR_SLEEP_TIME,
+    maxAllowedPendingTransactions:
+      process.env.TRANSACTION_CREATOR_MAX_ALLOWED_PENDING_TRANSACTIONS,
+    getPendingRequestsLimit:
+      process.env.TRANSACTION_CREATOR_GET_PENDING_REQUESTS_LIMIT,
   },
   s3: {
     url: process.env.S3_URL,
