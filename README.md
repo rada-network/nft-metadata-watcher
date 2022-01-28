@@ -11,13 +11,6 @@
 
 ## Enviroment variable description:
 
-ETHEREUM_ACCOUNTS_PATH
-
-- Directory storing private key and address for signer.
-- For example:
-  - ./accounts/signer/privateKey - Storing account private key plain text.
-  - ./accounts/signer/address -Storing account address plain text.
-
 POLYGON_URL
 POLYGON_CHAIN_ID
 POLYGON_NETWORK_ID
