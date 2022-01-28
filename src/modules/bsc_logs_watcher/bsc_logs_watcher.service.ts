@@ -130,9 +130,7 @@ export class BscLogsWatcherService {
     if (openBoxLogs.length > 0) {
       gasPrice = await this.polygonWeb3Service.getGasPrice();
       gasPrice = gasPrice.times(
-        this.configService.get(
-          'contract.randomizeByRarityContractGasPriceScale',
-        ),
+        this.configService.get('polygon.gasPriceScale'),
       );
       this.logger.log(`gasPrice: 0x${gasPrice.toString(16)}`);
     }
@@ -198,9 +196,7 @@ export class BscLogsWatcherService {
               EthereumAccountRole.signer,
             ),
             to: getRandomizeByRarityContractAddress(polygonNetworkId),
-            gasLimit: this.configService.get(
-              'contract.randomizeByRarityContractGasLimit',
-            ),
+            gasLimit: this.configService.get('polygon.gasLimit'),
             gasPrice,
             value: new BigNumber(0),
             data: requestRandomNumber(polygonNetworkId, poolId, tokenId),

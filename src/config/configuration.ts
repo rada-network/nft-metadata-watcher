@@ -16,6 +16,8 @@ export default () => ({
     delayConfirmedBlocks: process.env.POLYGON_DELAY_CONFIRMED_BLOCKS,
     sleepTime: process.env.POLYGON_SLEEP_TIME,
     useEip1559: process.env.POLYGON_USE_EIP_1559,
+    gasLimit: process.env.POLYGON_GAS_LIMIT,
+    gasPriceScale: process.env.POLYGON_GAS_PRICE_SCALE,
   },
   bsc: {
     url: process.env.BSC_URL,
@@ -26,17 +28,13 @@ export default () => ({
     delayConfirmedBlocks: process.env.BSC_DELAY_CONFIRMED_BLOCKS,
     sleepTime: process.env.BSC_SLEEP_TIME,
     useEip1559: process.env.BSC_USE_EIP_1559,
+    gasLimit: process.env.BSC_GAS_LIMIT,
+    gasPriceScale: process.env.BSC_GAS_PRICE_SCALE,
   },
   contract: {
     openBoxContractAddress: process.env.OPEN_BOX_CONTRACT_ADDRESS,
-    openBoxContractGasLimit: process.env.OPEN_BOX_CONTRACT_GAS_LIMIT,
-    openBoxContractGasPriceScale: process.env.OPEN_BOX_CONTRACT_GAS_PRICE_SCALE,
     randomizeByRarityContractAddress:
       process.env.RANDOMIZE_BY_RARITY_CONTRACT_ADDRESS,
-    randomizeByRarityContractGasLimit:
-      process.env.RANDOMIZE_BY_RARITY_CONTRACT_GAS_LIMIT,
-    randomizeByRarityContractGasPriceScale:
-      process.env.RANDOMIZE_BY_RARITY_CONTRACT_GAS_PRICE_SCALE,
   },
   redis: {
     host: process.env.REDIS_HOST,

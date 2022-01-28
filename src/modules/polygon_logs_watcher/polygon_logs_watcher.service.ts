@@ -134,9 +134,7 @@ export class PolygonLogsWatcherService {
     let gasPrice: BigNumber;
     if (diceLandedLogs.length > 0) {
       gasPrice = await this.bscWeb3Service.getGasPrice();
-      gasPrice = gasPrice.times(
-        this.configService.get('contract.openBoxContractGasPriceScale'),
-      );
+      gasPrice = gasPrice.times(this.configService.get('bsc.gasPriceScale'));
       this.logger.log(`gasPrice: 0x${gasPrice.toString(16)}`);
     }
 
@@ -217,9 +215,7 @@ export class PolygonLogsWatcherService {
               EthereumAccountRole.signer,
             ),
             to: getOpenBoxContractAddress(bscNetworkId),
-            gasLimit: this.configService.get(
-              'contract.openBoxContractGasLimit',
-            ),
+            gasLimit: this.configService.get('bsc.gasLimit'),
             gasPrice,
             value: new BigNumber(0),
             data: updateNFT(bscNetworkId, poolId, tokenId, rarity),
