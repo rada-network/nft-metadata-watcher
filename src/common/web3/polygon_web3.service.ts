@@ -2,6 +2,7 @@ import Common from '@ethereumjs/common';
 import { Injectable } from '@nestjs/common';
 import { Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import BigNumber from 'bignumber.js';
 import Web3 from 'web3';
 import { toBufferFromString } from '../ethereum_util/ethereum.util';
 import { Web3Service } from './web3.service';
@@ -54,5 +55,22 @@ export class PolygonWeb3Service extends Web3Service {
     return toBufferFromString(
       `0x${this.configService.get('polygon.accountPrivateKey')}`,
     );
+  }
+
+  async getGasPriceWithScale(): Promise<BigNumber> {
+    let gasPrice = await this.getGasPrice();
+    gasPrice = gasPrice.times(this.configService.get('polygon.gasPriceScale'));
+
+    const minGasPrice = new BigNumber(
+      this.web3.utils
+        .toWei(this.configService.get('polygon.minimumGasPriceGwei'), 'Gwei')
+        .toString(),
+    );
+
+    if (gasPrice.isLessThan(minGasPrice)) {
+      return minGasPrice;
+    }
+
+    return gasPrice;
   }
 }

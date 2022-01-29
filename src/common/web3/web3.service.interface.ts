@@ -38,4 +38,6 @@ export interface IWeb3Service {
   getAddress(): string;
 
   getPrivateKey(): Buffer;
+
+  getGasPriceWithScale(): Promise<BigNumber>;
 }

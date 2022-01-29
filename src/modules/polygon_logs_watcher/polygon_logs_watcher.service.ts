@@ -125,13 +125,6 @@ export class PolygonLogsWatcherService {
       `scanned diceLanded event logs: ${JSON.stringify(diceLandedLogs)}`,
     );
 
-    let gasPrice: BigNumber;
-    if (diceLandedLogs.length > 0) {
-      gasPrice = await this.bscWeb3Service.getGasPrice();
-      gasPrice = gasPrice.times(this.configService.get('bsc.gasPriceScale'));
-      this.logger.log(`gasPrice: 0x${gasPrice.toString(16)}`);
-    }
-
     await Promise.map(diceLandedLogs, ({ transactionHash, data }) => {
       const dataBuffer = toBufferFromString(data);
       const poolId = toNumber(dataBuffer.slice(0, 32));
@@ -145,7 +138,6 @@ export class PolygonLogsWatcherService {
         poolId,
         tokenId,
         rarity: result,
-        gasPrice,
       };
 
       // CONSIDER: set concurrency properly.
@@ -159,13 +151,11 @@ export class PolygonLogsWatcherService {
     poolId,
     tokenId,
     rarity,
-    gasPrice,
   }: {
     transactionHash: string;
     poolId: number;
     tokenId: number;
     rarity: number;
-    gasPrice: BigNumber;
   }): Promise<boolean> {
     const queryRunner = await this.transaction
       .startTransaction()
@@ -208,7 +198,6 @@ export class PolygonLogsWatcherService {
             from: this.bscWeb3Service.getAddress(),
             to: getOpenBoxContractAddress(bscNetworkId),
             gasLimit: this.configService.get('bsc.gasLimit'),
-            gasPrice,
             value: new BigNumber(0),
             data: updateNFT(bscNetworkId, poolId, tokenId, rarity),
           },

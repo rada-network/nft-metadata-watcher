@@ -134,11 +134,9 @@ export abstract class Web3Service implements IWeb3Service {
     }
   }
 
-  getAddress(): string {
-    throw new Error('This is abstract medthod.');
-  }
+  abstract getAddress(): string;
 
-  getPrivateKey(): Buffer {
-    throw new Error('This is abstract medthod.');
-  }
+  abstract getPrivateKey(): Buffer;
+
+  abstract getGasPriceWithScale(): Promise<BigNumber>;
 }

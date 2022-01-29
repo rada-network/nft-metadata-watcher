@@ -120,15 +120,6 @@ export class BscLogsWatcherService {
       `scanned OpenBox event logs: ${JSON.stringify(openBoxLogs)}`,
     );
 
-    let gasPrice: BigNumber;
-    if (openBoxLogs.length > 0) {
-      gasPrice = await this.polygonWeb3Service.getGasPrice();
-      gasPrice = gasPrice.times(
-        this.configService.get('polygon.gasPriceScale'),
-      );
-      this.logger.log(`gasPrice: 0x${gasPrice.toString(16)}`);
-    }
-
     await Promise.map(openBoxLogs, ({ transactionHash, topics, data }) => {
       const poolId = toNumber(toBufferFromString(topics[1]));
       const tokenId = toNumber(toBufferFromString(topics[2]));
@@ -140,7 +131,6 @@ export class BscLogsWatcherService {
         buyerAddress,
         poolId,
         tokenId,
-        gasPrice,
       };
     }).map(this.handleOpenBoxLogData.bind(this), { concurrency: 3 });
 
@@ -152,13 +142,11 @@ export class BscLogsWatcherService {
     buyerAddress,
     poolId,
     tokenId,
-    gasPrice,
   }: {
     transactionHash: string;
     buyerAddress: string;
     poolId: number;
     tokenId: number;
-    gasPrice: BigNumber;
   }): Promise<boolean> {
     const queryRunner = await this.transaction
       .startTransaction()
@@ -189,7 +177,6 @@ export class BscLogsWatcherService {
             from: this.polygonWeb3Service.getAddress(),
             to: getRandomizeByRarityContractAddress(polygonNetworkId),
             gasLimit: this.configService.get('polygon.gasLimit'),
-            gasPrice,
             value: new BigNumber(0),
             data: requestRandomNumber(polygonNetworkId, poolId, tokenId),
           },

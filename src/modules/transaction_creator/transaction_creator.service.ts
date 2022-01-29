@@ -1,5 +1,6 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import BigNumber from 'bignumber.js';
 import { Promise } from 'bluebird';
 import { TransactionInterface } from 'src/common/transaction/transaction.interface';
 import { IWeb3Service } from 'src/common/web3/web3.service.interface';
@@ -82,6 +83,10 @@ export class TransactionCreatorService {
       );
       return true;
     }
+
+    const gasPrice = await web3Service.getGasPriceWithScale();
+    this.logger.log(`gasPrice: 0x${gasPrice.toString(16)}`);
+
     await Promise.map(
       pendingTransactionRequests,
       (transactionRequest, index) => {
@@ -89,6 +94,7 @@ export class TransactionCreatorService {
           type,
           transactionRequest,
           nonce: basePendingNonce + index,
+          gasPrice,
           web3Service,
         };
       },
@@ -101,11 +107,13 @@ export class TransactionCreatorService {
     type,
     transactionRequest,
     nonce,
+    gasPrice,
     web3Service,
   }: {
     type: TransactionRequestType;
     transactionRequest: Type;
     nonce: number;
+    gasPrice: BigNumber;
     web3Service: IWeb3Service;
   }): Promise<boolean> {
     const queryRunner = await this.transaction
@@ -128,6 +136,7 @@ export class TransactionCreatorService {
         );
       }
       lockedRequest.nonce = nonce;
+      lockedRequest.gasPrice = gasPrice;
       lockedRequest.attempt = lockedRequest.attempt + 1;
 
       const txData = lockedRequest.getTxData();
@@ -140,7 +149,7 @@ export class TransactionCreatorService {
       lockedRequest.status = TransactionRequestStatus.success;
       lockedRequest.hash = hash;
       this.logger.log(
-        `${type}: Request was confirmed on blockchain, listening error event 
+        `${type}: Request was sent to blockchain, listening error event 
         - id=${lockedRequest.id},attempt=${lockedRequest.attempt}, nonce=${nonce} txHash=${hash}`,
       );
 
